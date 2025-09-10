@@ -1,51 +1,42 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import { useAuthStore } from "./store/useAuthStore";
-import { useEffect, useState } from "react";
+import { Toaster } from "react-hot-toast";
+import ProtectedRoutes from "./components/ProtectedRoutes";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import AdminProductUpload from "./pages/AdminProductUpload";
-import AdminDashboard from "./pages/AdminDashboard";
-import Checkout from "./pages/Checkout";
 import Cart from "./pages/Cart";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
-import ProtectedRoutes from "./components/ProtectedRoutes";
-import { Toaster } from "react-hot-toast";
+import Checkout from "./pages/Checkout";
+import ThankyouPage from "./pages/ThankyouPage";
+import MyOrders from "./pages/MyOrders";
+
+// Admin Pages
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminProductUpload from "./pages/AdminControlls/AdminProductUpload";
 import ProductManage from "./pages/AdminControlls/ProductManage";
 import AdminUserManage from "./pages/AdminControlls/AdminUserManage";
 import AdminOrderManage from "./pages/AdminControlls/AdminOrderManage";
-import ThankyouPage from "./pages/ThankyouPage";
-import MyOrders from "./pages/MyOrders";
-import { Divide, Loader2 } from "lucide-react";
 
 function App() {
-  const { user, fetchCurrentUser } = useAuthStore();
-  const [loading, setLoading] = useState(true);
+  const { fetchCurrentUser, user } = useAuthStore();
 
   useEffect(() => {
-    const loadUser = async () => {
-      await fetchCurrentUser();
-      setLoading(false);
-    };
-    loadUser();
+    fetchCurrentUser();
   }, []);
-
-  if (loading)
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-800">
-        <Loader2 className=" animate-spin text-gray-500" size={60} />
-      </div>
-    );
 
   return (
     <BrowserRouter>
       <Toaster />
       <Routes>
+        {/* Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Register />} />
 
+        {/* Protected user routes */}
         <Route
           path="/"
           element={
@@ -79,10 +70,10 @@ function App() {
           }
         />
         <Route
-          path="/orders"
+          path="/checkout"
           element={
             <ProtectedRoutes>
-              <MyOrders />
+              <Checkout />
             </ProtectedRoutes>
           }
         />
@@ -94,16 +85,16 @@ function App() {
             </ProtectedRoutes>
           }
         />
-
         <Route
-          path="/checkout"
+          path="/orders"
           element={
             <ProtectedRoutes>
-              <Checkout />
+              <MyOrders />
             </ProtectedRoutes>
           }
         />
 
+        {/* Admin routes */}
         {user?.isAdmin && (
           <>
             <Route

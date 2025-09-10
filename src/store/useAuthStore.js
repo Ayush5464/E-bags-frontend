@@ -1,35 +1,44 @@
-// useAuthStore.js
 import { create } from "zustand";
 import API from "../api/axios";
 
 export const useAuthStore = create((set) => ({
     user: null,
+    loading: true,
 
-    //  Called on refresh to restore session from cookie
     fetchCurrentUser: async () => {
+        set({ loading: true });
         try {
-            const res = await API.get("/auth/me"); // should return { user: {...} }
-            set({ user: res.data.user });
+            const res = await API.get("/auth/me"); // backend /me endpoint
+            set({ user: res.data });
         } catch (err) {
             set({ user: null });
+        } finally {
+            set({ loading: false });
         }
     },
 
     login: async (email, password) => {
-        const res = await API.post("/auth/login", { email, password });
-
-        const user = res.data.user;
-        set({ user }); // save user to store
-        return user;   // 
-    },
-
-    register: async (formData) => {
-        await API.post("/auth/signup", formData);
+        set({ loading: true });
+        try {
+            const res = await API.post("/auth/login", { email, password });
+            set({ user: res.data.user });
+        } catch (err) {
+            set({ user: null });
+            throw err;
+        } finally {
+            set({ loading: false });
+        }
     },
 
     logout: async () => {
-        await API.post("/auth/logout");
-        set({ user: null });
-
+        set({ loading: true });
+        try {
+            await API.post("/auth/logout");
+            set({ user: null });
+        } catch (err) {
+            console.error(err);
+        } finally {
+            set({ loading: false });
+        }
     },
 }));
