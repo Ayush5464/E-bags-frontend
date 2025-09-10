@@ -10,7 +10,7 @@ function ProtectedRoutes({ children, adminOnly = false }) {
   // 1. Show loading spinner while checking auth
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-800">
+      <div className="flex items-center justify-center h-screen bg-gray-900">
         <Loader2 className="animate-spin text-gray-400" size={48} />
       </div>
     );
