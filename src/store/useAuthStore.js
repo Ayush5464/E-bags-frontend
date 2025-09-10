@@ -1,48 +1,35 @@
+// useAuthStore.js
 import { create } from "zustand";
 import API from "../api/axios";
 
 export const useAuthStore = create((set) => ({
     user: null,
-    loading: true,
 
-    // Fetch current user from backend
+    //  Called on refresh to restore session from cookie
     fetchCurrentUser: async () => {
-        set({ loading: true });
         try {
-            const res = await API.get("/auth/me");
-            set({ user: res.data.user }); // make sure backend returns { user }
+            const res = await API.get("/auth/me"); // should return { user: {...} }
+            set({ user: res.data.user });
         } catch (err) {
             set({ user: null });
-        } finally {
-            set({ loading: false });
         }
     },
 
-    // Login user
     login: async (email, password) => {
-        set({ loading: true });
-        try {
-            const res = await API.post("/auth/login", { email, password });
-            set({ user: res.data.user }); // store user in Zustand
-            return res.data.user; // ✅ return user for Login component
-        } catch (err) {
-            set({ user: null });
-            throw err;
-        } finally {
-            set({ loading: false });
-        }
+        const res = await API.post("/auth/login", { email, password });
+
+        const user = res.data.user;
+        set({ user }); // save user to store
+        return user;   // 
     },
 
-    // Logout user
+    register: async (formData) => {
+        await API.post("/auth/signup", formData);
+    },
+
     logout: async () => {
-        set({ loading: true });
-        try {
-            await API.post("/auth/logout");
-            set({ user: null });
-        } catch (err) {
-            console.error(err);
-        } finally {
-            set({ loading: false });
-        }
+        await API.post("/auth/logout");
+        set({ user: null });
+
     },
 }));
