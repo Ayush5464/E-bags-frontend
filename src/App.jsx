@@ -16,7 +16,7 @@ import MyOrders from "./pages/MyOrders";
 
 // Admin Pages
 import AdminDashboard from "./pages/AdminDashboard";
-import AdminProductUpload from "./pages/AdminControlls/AdminProductUpload";
+import AdminProductUpload from "./pages/AdminProductUpload";
 import ProductManage from "./pages/AdminControlls/ProductManage";
 import AdminUserManage from "./pages/AdminControlls/AdminUserManage";
 import AdminOrderManage from "./pages/AdminControlls/AdminOrderManage";
