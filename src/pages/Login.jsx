@@ -17,18 +17,15 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // login returns the user object
-      const loggedInUser = await login(form.email, form.password);
+      const loggedInUser = await login(form.email, form.password); // ✅ login returns user
       toast.success("Login successful!");
 
-      // Redirect based on role
-      if (loggedInUser?.isAdmin) {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
+      if (loggedInUser?.isAdmin) navigate("/admin");
+      else navigate("/");
     } catch (err) {
-      toast.error("Login failed. Check your credentials.");
+      toast.error(
+        err.response?.data?.message || "Login failed. Check credentials."
+      );
       console.error(err);
     } finally {
       setLoading(false);
