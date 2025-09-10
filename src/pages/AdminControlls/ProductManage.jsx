@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Edit, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import API from "../../api/axios";
-import AdminLayout from "./AdminLayout"; // ✅ Adjust path as per your folder structure
+import AdminLayout from "./AdminLayout"; 
 
 export default function ProductManage() {
   const [products, setProducts] = useState([]);

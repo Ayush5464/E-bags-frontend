@@ -18,6 +18,7 @@ import AdminUserManage from "./pages/AdminControlls/AdminUserManage";
 import AdminOrderManage from "./pages/AdminControlls/AdminOrderManage";
 import ThankyouPage from "./pages/ThankyouPage";
 import MyOrders from "./pages/MyOrders";
+import { Divide, Loader2 } from "lucide-react";
 
 function App() {
   const { user, fetchCurrentUser } = useAuthStore();
@@ -31,7 +32,12 @@ function App() {
     loadUser();
   }, []);
 
-  if (loading) return <p className="p-4">Loading...</p>; // 🔄 Wait before rendering
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-800">
+        <Loader2 className=" animate-spin text-gray-500" size={60} />
+      </div>
+    );
 
   return (
     <BrowserRouter>
