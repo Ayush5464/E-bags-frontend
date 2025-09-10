@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axios";
 import toast from "react-hot-toast";
-import AdminLayout from "../admin controlls/Adminlayout";
+import AdminLayout from "../admin controlls/AdminLayout";
 
 export default function AdminOrderManage() {
   const [orders, setOrders] = useState([]);
