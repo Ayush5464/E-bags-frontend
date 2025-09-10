@@ -1,6 +1,7 @@
 import { useState } from "react";
 import API from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function AdminProductUpload() {
   const [form, setForm] = useState({
@@ -41,8 +42,9 @@ export default function AdminProductUpload() {
       await API.post("/products", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert("Product uploaded successfully!");
+      toast.success("Product uploaded successfully!");
       navigate("/admin/uploads");
+      location.reload();
     } catch (err) {
       alert(err.response?.data?.message || "Failed to upload product");
     } finally {
