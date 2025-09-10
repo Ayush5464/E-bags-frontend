@@ -1,7 +1,6 @@
 import { useCartStore } from "../store/useCartStore";
 import { useNavigate } from "react-router-dom";
-
-const BASE_URL = "https://e-bags-backend.onrender.com";
+import API from "../api/axios";
 
 export default function ProductCard({ product }) {
   const addToCart = useCartStore((state) => state.addToCart);
@@ -12,7 +11,7 @@ export default function ProductCard({ product }) {
   };
 
   const handleAddToCart = (e) => {
-    e.stopPropagation(); // prevent navigation when clicking button
+    e.stopPropagation();
     addToCart(product._id, 1);
   };
 
@@ -23,7 +22,7 @@ export default function ProductCard({ product }) {
     >
       <div className="p-5">
         <img
-          src={`${BASE_URL}${product.images?.[0] || product.image}`}
+          src={`${API.defaults.baseURL}${product.images?.[0] || product.image}`}
           alt={product.name}
           className="h-48 w-full object-cover"
         />
