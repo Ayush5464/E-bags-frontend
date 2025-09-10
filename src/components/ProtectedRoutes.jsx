@@ -5,26 +5,24 @@ import { useAuthStore } from "../store/useAuthStore";
 import { Loader2 } from "lucide-react";
 
 function ProtectedRoutes({ children, adminOnly = false }) {
-  const { user, loading } = useAuthStore(); // add loading state from store
+  const { user, loading } = useAuthStore();
 
-  // Show loader while checking auth
+  // 1. Show loading spinner while checking auth
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-800">
-        <div className="animate-spin text-gray-500 text-4xl">
-          <Loader2 className="animate-spin" size={40} />
-        </div>
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <Loader2 className="animate-spin text-gray-400" size={48} />
       </div>
     );
   }
 
-  // Redirect if not logged in
+  // 2. If not logged in → redirect to login
   if (!user) return <Navigate to="/login" replace />;
 
-  // Redirect if adminOnly route but user is not admin
+  // 3. If adminOnly but user is not admin → redirect to home
   if (adminOnly && !user.isAdmin) return <Navigate to="/" replace />;
 
-  // Render protected page with navbar
+  // 4. Otherwise → render the protected content
   return (
     <>
       <Navbar />

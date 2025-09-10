@@ -1,44 +1,25 @@
-import { create } from "zustand";
-import API from "../api/axios";
+import { Navigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
+import Navbar from "./Navbar";
 
-export const useAuthStore = create((set) => ({
-    user: null,
-    loading: true,
+export default function ProtectedRoutes({ children, adminOnly = false }) {
+    const { user, loading } = useAuthStore();
 
-    fetchCurrentUser: async () => {
-        set({ loading: true });
-        try {
-            const res = await API.get("/auth/me"); // backend /me endpoint
-            set({ user: res.data });
-        } catch (err) {
-            set({ user: null });
-        } finally {
-            set({ loading: false });
-        }
-    },
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen bg-gray-800">
+                <div className="animate-spin text-gray-400 text-3xl">⏳</div>
+            </div>
+        );
+    }
 
-    login: async (email, password) => {
-        set({ loading: true });
-        try {
-            const res = await API.post("/auth/login", { email, password });
-            set({ user: res.data.user });
-        } catch (err) {
-            set({ user: null });
-            throw err;
-        } finally {
-            set({ loading: false });
-        }
-    },
+    if (!user) return <Navigate to="/login" replace />;
+    if (adminOnly && !user.isAdmin) return <Navigate to="/" replace />;
 
-    logout: async () => {
-        set({ loading: true });
-        try {
-            await API.post("/auth/logout");
-            set({ user: null });
-        } catch (err) {
-            console.error(err);
-        } finally {
-            set({ loading: false });
-        }
-    },
-}));
+    return (
+        <>
+            <Navbar />
+            {children}
+        </>
+    );
+}

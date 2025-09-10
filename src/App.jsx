@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useAuthStore } from "./store/useAuthStore";
 import { Toaster } from "react-hot-toast";
 import ProtectedRoutes from "./components/ProtectedRoutes";
+import { Loader2 } from "lucide-react";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -22,11 +23,19 @@ import AdminUserManage from "./pages/AdminControlls/AdminUserManage";
 import AdminOrderManage from "./pages/AdminControlls/AdminOrderManage";
 
 function App() {
-  const { fetchCurrentUser, user } = useAuthStore();
+  const { fetchCurrentUser, user, loading } = useAuthStore();
 
   useEffect(() => {
     fetchCurrentUser();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <Loader2 className="animate-spin text-gray-400" size={48} />
+      </div>
+    );
+  }
 
   return (
     <BrowserRouter>
@@ -100,7 +109,7 @@ function App() {
             <Route
               path="/admin"
               element={
-                <ProtectedRoutes>
+                <ProtectedRoutes adminOnly>
                   <AdminDashboard />
                 </ProtectedRoutes>
               }
@@ -108,7 +117,7 @@ function App() {
             <Route
               path="/admin/uploads"
               element={
-                <ProtectedRoutes>
+                <ProtectedRoutes adminOnly>
                   <AdminProductUpload />
                 </ProtectedRoutes>
               }
@@ -116,7 +125,7 @@ function App() {
             <Route
               path="/admin/product"
               element={
-                <ProtectedRoutes>
+                <ProtectedRoutes adminOnly>
                   <ProductManage />
                 </ProtectedRoutes>
               }
@@ -124,7 +133,7 @@ function App() {
             <Route
               path="/admin/users"
               element={
-                <ProtectedRoutes>
+                <ProtectedRoutes adminOnly>
                   <AdminUserManage />
                 </ProtectedRoutes>
               }
@@ -132,7 +141,7 @@ function App() {
             <Route
               path="/admin/orders"
               element={
-                <ProtectedRoutes>
+                <ProtectedRoutes adminOnly>
                   <AdminOrderManage />
                 </ProtectedRoutes>
               }
