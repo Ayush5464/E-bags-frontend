@@ -13,9 +13,9 @@ import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import { Toaster } from "react-hot-toast";
-import ProductManage from "./pages/admin controlls/ProductManage";
-import AdminUserManage from "./pages/admin controlls/AdminUserManage";
-import AdminOrderManage from "./pages/admin controlls/AdminOrderManage";
+import ProductManage from "./pages/AdminControlls/ProductManage";
+import AdminUserManage from "./pages/AdminControlls/AdminUserManage";
+import AdminOrderManage from "./pages/AdminControlls/AdminOrderManage";
 import ThankyouPage from "./pages/ThankyouPage";
 import MyOrders from "./pages/MyOrders";
 
