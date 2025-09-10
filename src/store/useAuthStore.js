@@ -9,7 +9,7 @@ export const useAuthStore = create((set) => ({
         set({ loading: true });
         try {
             const res = await API.get("/auth/me");
-            set({ user: res.data });
+            set({ user: res.data.user });
         } catch (err) {
             set({ user: null });
         } finally {
@@ -36,7 +36,7 @@ export const useAuthStore = create((set) => ({
             await API.post("/auth/logout");
             set({ user: null });
         } catch (err) {
-            console.error("Logout failed:", err);
+            console.error(err);
         } finally {
             set({ loading: false });
         }

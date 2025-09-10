@@ -1,15 +1,13 @@
 import { useCartStore } from "../store/useCartStore";
 import { useNavigate } from "react-router-dom";
-import API from "../api/axios";
+
+const BASE_URL = "https://e-bags-backend.onrender.com";
 
 export default function ProductCard({ product }) {
   const addToCart = useCartStore((state) => state.addToCart);
   const navigate = useNavigate();
 
-  const handleCardClick = () => {
-    navigate(`/products/${product._id}`);
-  };
-
+  const handleCardClick = () => navigate(`/products/${product._id}`);
   const handleAddToCart = (e) => {
     e.stopPropagation();
     addToCart(product._id, 1);
@@ -22,12 +20,11 @@ export default function ProductCard({ product }) {
     >
       <div className="p-5">
         <img
-          src={`${API.defaults.baseURL}${product.images?.[0] || product.image}`}
+          src={`${BASE_URL}${product.images?.[0] || product.image}`}
           alt={product.name}
           className="h-48 w-full object-cover"
         />
       </div>
-
       <div className="p-4 flex flex-col justify-between h-full">
         <div>
           <h2 className="text-lg font-semibold text-gray-800">
@@ -36,7 +33,6 @@ export default function ProductCard({ product }) {
           <p className="text-gray-600 text-sm mt-1">₹{product.price}</p>
           <p className="text-xs text-gray-400 mt-1">{product.category}</p>
         </div>
-
         <button
           onClick={handleAddToCart}
           className="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded transition"
