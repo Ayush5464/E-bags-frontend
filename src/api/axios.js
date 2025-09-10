@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const API = axios.create({
-    baseURL: "http://localhost:5000/ebagmart",
-    withCredentials: true, 
+    baseURL: "https://e-bags-backend.onrender.com/ebagmart",
+    withCredentials: true,
 });
 
 export default API;
