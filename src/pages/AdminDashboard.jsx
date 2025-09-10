@@ -1,6 +1,6 @@
 // pages/AdminDashboard.jsx
 import React, { useEffect, useState } from "react";
-import AdminLayout from "./admin controlls/AdminLayout";
+import AdminLayout from "./AdminControlls/AdminLayout";
 import API from "../api/axios";
 
 function AdminDashboard() {
