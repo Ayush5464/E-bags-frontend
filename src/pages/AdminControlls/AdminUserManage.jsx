@@ -1,4 +1,4 @@
-// pages/AdminUserManage.jsx
+// pages/AdminControlls/AdminUserManage.jsx
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import API from "../../api/axios";
@@ -7,13 +7,23 @@ import AdminLayout from "./AdminLayout";
 
 export default function AdminUserManage() {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchUsers = async () => {
     try {
-      const res = await API.get("/admin/users");
-      setUsers(res.data);
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Unauthorized");
+
+      const res = await API.get("/admin/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setUsers(res.data.users || res.data); // support both response formats
     } catch (err) {
-      toast.error("Failed to load users");
+      console.error("Failed to load users:", err);
+      toast.error("Failed to load users. Make sure you are an admin.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -24,23 +34,48 @@ export default function AdminUserManage() {
   const handleDelete = async (id) => {
     if (!confirm("Delete this user?")) return;
     try {
-      await API.delete(`/admin/users/${id}`);
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Unauthorized");
+
+      await API.delete(`/admin/users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       toast.success("User deleted");
       setUsers(users.filter((u) => u._id !== id));
     } catch (err) {
+      console.error("Delete failed:", err);
       toast.error("Delete failed");
     }
   };
 
   const handleRoleToggle = async (id, isAdmin) => {
     try {
-      const res = await API.put(`/admin/users/${id}`, { isAdmin: !isAdmin });
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Unauthorized");
+
+      const res = await API.put(
+        `/admin/users/${id}`,
+        { isAdmin: !isAdmin },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
       toast.success("Role updated");
-      setUsers(users.map((u) => (u._id === id ? res.data.user : u)));
+      setUsers(
+        users.map((u) => (u._id === id ? res.data.user || res.data : u))
+      );
     } catch (err) {
+      console.error("Failed to update role:", err);
       toast.error("Failed to update role");
     }
   };
+
+  if (loading)
+    return (
+      <AdminLayout>
+        <p className="p-6">Loading users...</p>
+      </AdminLayout>
+    );
 
   return (
     <AdminLayout>
@@ -56,6 +91,13 @@ export default function AdminUserManage() {
             </tr>
           </thead>
           <tbody>
+            {users.length === 0 && (
+              <tr>
+                <td colSpan="4" className="text-center py-6 text-gray-500">
+                  No users found.
+                </td>
+              </tr>
+            )}
             {users.map((u) => (
               <tr key={u._id} className="border-b">
                 <td className="p-3">{u.name}</td>
@@ -83,13 +125,6 @@ export default function AdminUserManage() {
                 </td>
               </tr>
             ))}
-            {users.length === 0 && (
-              <tr>
-                <td colSpan="4" className="text-center py-6 text-gray-500">
-                  No users found.
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
       </div>
