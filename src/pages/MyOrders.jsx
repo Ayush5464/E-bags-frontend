@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import API from "../api/axios";
 import { toast } from "react-hot-toast";
 import { useAuthStore } from "../store/useAuthStore";
+import API from "../api/axios";
 
 export default function MyOrders() {
   const { user } = useAuthStore();
