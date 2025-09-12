@@ -8,9 +8,7 @@ export default function AdminOrderManage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Include JWT in headers
   const fetchOrders = async () => {
-    setLoading(true);
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Unauthorized");
@@ -19,9 +17,9 @@ export default function AdminOrderManage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setOrders(res.data);
+      setOrders(res.data.orders || res.data); // support both structures
     } catch (err) {
-      console.error("Fetch orders failed:", err);
+      console.error("Failed to fetch orders:", err);
       toast.error("Failed to fetch orders. Make sure you are an admin.");
     } finally {
       setLoading(false);
@@ -39,12 +37,15 @@ export default function AdminOrderManage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success("Status updated");
+      const updatedOrder = res.data.order || res.data; // fallback
+
       setOrders((prev) =>
-        prev.map((order) => (order._id === orderId ? res.data.order : order))
+        prev.map((order) => (order._id === orderId ? updatedOrder : order))
       );
+
+      toast.success("Status updated successfully");
     } catch (err) {
-      console.error("Update status failed:", err);
+      console.error("Failed to update status:", err);
       toast.error("Failed to update status");
     }
   };
@@ -78,40 +79,39 @@ export default function AdminOrderManage() {
               </tr>
             </thead>
             <tbody>
-              {orders.length > 0 ? (
-                orders.map((order) => (
-                  <tr key={order._id} className="border-b hover:bg-gray-50">
-                    <td className="p-3">{order._id}</td>
-                    <td className="p-3">{order.user?.name || "Unknown"}</td>
-                    <td className="p-3">₹{order.totalAmount}</td>
-                    <td className="p-3">{order.status}</td>
-                    <td className="p-3">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="p-3 text-center">
-                      <select
-                        value={order.status}
-                        onChange={(e) =>
-                          handleStatusChange(order._id, e.target.value)
-                        }
-                        className="p-1 rounded border text-sm"
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
-                      </select>
-                    </td>
-                  </tr>
-                ))
-              ) : (
+              {orders.length === 0 && (
                 <tr>
                   <td colSpan="6" className="text-center p-4 text-gray-500">
                     No orders found.
                   </td>
                 </tr>
               )}
+              {orders.map((order) => (
+                <tr key={order._id} className="border-b hover:bg-gray-50">
+                  <td className="p-3">{order._id}</td>
+                  <td className="p-3">{order.user?.name || "Unknown"}</td>
+                  <td className="p-3">₹{order.totalAmount}</td>
+                  <td className="p-3">{order.status}</td>
+                  <td className="p-3">
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="p-3 text-center">
+                    <select
+                      value={order.status}
+                      onChange={(e) =>
+                        handleStatusChange(order._id, e.target.value)
+                      }
+                      className="p-1 rounded border text-sm"
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Processing">Processing</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
