@@ -3,12 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import API from "../api/axios";
 import { useCartStore } from "../store/useCartStore";
 
-// ✅ Backend base URL
+// ✅ Set correct backend base URL
 const BASE_URL = "https://e-bags-backend.onrender.com";
-
-// ✅ Utility to format image URL
-const getImageUrl = (path) =>
-  path?.startsWith("http") ? path : `${BASE_URL}/uploads/${path}`;
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -26,6 +22,12 @@ export default function ProductDetails() {
   }, [id]);
 
   if (!product) return <p className="p-4">Loading product...</p>;
+
+  // ✅ Build full image URL
+  const getImageUrl = (imagePath) =>
+    imagePath?.startsWith("http")
+      ? imagePath
+      : `${BASE_URL}/uploads/${imagePath}`;
 
   return (
     <div className="max-w-5xl mx-auto mt-8 p-4">
@@ -50,7 +52,7 @@ export default function ProductDetails() {
             className="w-full md:w-96 h-96 object-cover rounded-lg"
           />
 
-          {/* Thumbnail Images */}
+          {/* Additional Images */}
           <div className="flex gap-2 mt-2 flex-wrap">
             {product.images?.map((img, index) => (
               <img
