@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import API from "../api/axios";
-import { Loader2 } from "lucide-react";
 import { useCartStore } from "../store/useCartStore";
+import { Loader2 } from "lucide-react";
 
+// Backend base URL
 const BASE_URL = "https://e-bags-backend.onrender.com";
 
-// Helper function
-const getImageUrl = (img) => {
-  if (!img) return "";
-  return img.startsWith("http")
-    ? img
-    : `${BASE_URL}/uploads/${img.replace(/^\/uploads\//, "")}`;
+// Helper to generate correct image URL
+const getImageUrl = (path) => {
+  if (!path) return ""; // safety check
+  if (path.startsWith("http")) return path; // already full URL
+  return path.startsWith("/uploads/")
+    ? `${BASE_URL}${path}`
+    : `${BASE_URL}/uploads/${path}`;
 };
 
 export default function ProductDetails() {
@@ -38,10 +40,11 @@ export default function ProductDetails() {
 
   return (
     <div className="max-w-5xl mx-auto mt-8 p-4">
+      {/* Breadcrumb */}
       <nav className="text-sm text-gray-600 mb-4">
-        <Link to="/" className="hover:underline">
+        <a href="/" className="hover:underline">
           Home
-        </Link>{" "}
+        </a>{" "}
         /{" "}
         <Link to="/products" className="hover:underline">
           Products
@@ -50,6 +53,7 @@ export default function ProductDetails() {
       </nav>
 
       <div className="flex flex-col md:flex-row gap-8">
+        {/* Images */}
         <div className="flex flex-col gap-2">
           <img
             src={getImageUrl(mainImage)}
@@ -57,11 +61,11 @@ export default function ProductDetails() {
             className="w-full md:w-96 h-96 object-cover rounded-lg"
           />
           <div className="flex gap-2 mt-2 flex-wrap">
-            {product.images?.map((img, idx) => (
+            {product.images?.map((img, index) => (
               <img
-                key={idx}
+                key={index}
                 src={getImageUrl(img)}
-                alt={`Product ${idx + 1}`}
+                alt={`Product ${index + 1}`}
                 className={`w-20 h-20 object-cover rounded cursor-pointer border ${
                   mainImage === img ? "border-blue-600" : "border-gray-200"
                 }`}
@@ -71,6 +75,7 @@ export default function ProductDetails() {
           </div>
         </div>
 
+        {/* Product Info */}
         <div className="flex-1 flex flex-col justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
