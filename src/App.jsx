@@ -13,7 +13,6 @@ import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
 import Checkout from "./pages/Checkout";
 import ThankyouPage from "./pages/ThankyouPage";
-import MyOrders from "./pages/MyOrders";
 
 // Admin Pages
 import AdminDashboard from "./pages/AdminDashboard";
@@ -21,6 +20,7 @@ import AdminProductUpload from "./pages/AdminProductUpload";
 import ProductManage from "./pages/AdminControlls/ProductManage";
 import AdminUserManage from "./pages/AdminControlls/AdminUserManage";
 import AdminOrderManage from "./pages/AdminControlls/AdminOrderManage";
+import MyOrders from "./pages/MyOrders";
 
 function App() {
   const { fetchCurrentUser, user, loading } = useAuthStore();
@@ -95,7 +95,7 @@ function App() {
           }
         />
         <Route
-          path="/orders"
+          path="/my-orders"
           element={
             <ProtectedRoutes>
               <MyOrders />
