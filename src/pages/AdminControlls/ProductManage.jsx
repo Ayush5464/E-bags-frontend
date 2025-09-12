@@ -10,6 +10,7 @@ export default function ProductManage() {
   const [products, setProducts] = useState([]);
   const [editingProductId, setEditingProductId] = useState(null);
   const [form, setForm] = useState({});
+  const [newImage, setNewImage] = useState(null);
 
   const fetchProducts = async () => {
     try {
@@ -47,28 +48,50 @@ export default function ProductManage() {
       category: product.category,
       countInStock: product.countInStock,
     });
+    setNewImage(null);
   };
 
   const handleCancel = () => {
     setEditingProductId(null);
     setForm({});
+    setNewImage(null);
   };
 
   const handleInputChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) setNewImage(file);
+  };
+
   const handleUpdate = async (id) => {
     try {
-      await API.put(`/products/${id}`, form, {
+      const formData = new FormData();
+      for (let key in form) {
+        formData.append(key, form[key]);
+      }
+
+      // if new image is selected, include it in formData
+      if (newImage) {
+        formData.append("images", newImage);
+      }
+
+      await API.put(`/products/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
         },
       });
+
       toast.success("Product updated");
       setEditingProductId(null);
+      setForm({});
+      setNewImage(null);
       fetchProducts();
     } catch (err) {
+      console.error(err);
       toast.error("Update failed");
     }
   };
@@ -98,7 +121,14 @@ export default function ProductManage() {
                 <tr key={product._id} className="border-b hover:bg-gray-50">
                   <td className="p-3">{idx + 1}</td>
                   <td className="p-3">
-                    {product.images?.[0] ? (
+                    {editingProductId === product._id ? (
+                      <input
+                        type="file"
+                        name="images"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                      />
+                    ) : product.images?.[0] ? (
                       <img
                         src={`https://e-bags-backend.onrender.com${product.images[0]}`}
                         alt={product.name}
@@ -172,13 +202,13 @@ export default function ProductManage() {
                           onClick={() => handleEdit(product)}
                           className="text-blue-600 hover:text-blue-800"
                         >
-                          <Edit size={18} />
+                          <Edit size={25} />
                         </button>
                         <button
                           onClick={() => handleDelete(product._id)}
                           className="text-red-600 hover:text-red-800"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={25} />
                         </button>
                       </td>
                     </>
