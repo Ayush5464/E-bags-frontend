@@ -4,14 +4,23 @@ import API from "../api/axios";
 import { useCartStore } from "../store/useCartStore";
 import { Loader2 } from "lucide-react";
 
-// ✅ Set correct backend base URL
+// Backend base URL
 const BASE_URL = "https://e-bags-backend.onrender.com";
+
+// Helper to generate correct image URL
+const getImageUrl = (path) => {
+  if (!path) return ""; // safety check
+  if (path.startsWith("http")) return path; // already full URL
+  return path.startsWith("/uploads/")
+    ? `${BASE_URL}${path}`
+    : `${BASE_URL}/uploads/${path}`;
+};
 
 export default function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
-  const addToCart = useCartStore((state) => state.addToCart);
   const [mainImage, setMainImage] = useState("");
+  const addToCart = useCartStore((state) => state.addToCart);
 
   useEffect(() => {
     API.get(`/products/${id}`)
@@ -29,12 +38,6 @@ export default function ProductDetails() {
       </div>
     );
 
-  // ✅ Build full image URL
-  const getImageUrl = (imagePath) =>
-    imagePath?.startsWith("http")
-      ? imagePath
-      : `${BASE_URL}/uploads/${imagePath}`;
-
   return (
     <div className="max-w-5xl mx-auto mt-8 p-4">
       {/* Breadcrumb */}
@@ -50,15 +53,13 @@ export default function ProductDetails() {
       </nav>
 
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Main Image */}
+        {/* Images */}
         <div className="flex flex-col gap-2">
           <img
             src={getImageUrl(mainImage)}
             alt={product.name}
             className="w-full md:w-96 h-96 object-cover rounded-lg"
           />
-
-          {/* Additional Images */}
           <div className="flex gap-2 mt-2 flex-wrap">
             {product.images?.map((img, index) => (
               <img
@@ -84,7 +85,6 @@ export default function ProductDetails() {
             </p>
             <p className="text-gray-700">{product.description}</p>
           </div>
-
           <button
             onClick={() => addToCart(product._id, 1)}
             className="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 w-full md:w-auto"
