@@ -12,7 +12,7 @@ export default function AdminProductUpload() {
     category: "",
     countInStock: "",
   });
-  const [images, setImages] = useState([]); // multiple images
+  const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -36,7 +36,6 @@ export default function AdminProductUpload() {
           : form[key];
       formData.append(key, value);
     }
-
     images.forEach((img) => formData.append("images", img));
 
     setLoading(true);
@@ -47,7 +46,7 @@ export default function AdminProductUpload() {
       await API.post("/products", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`, // ✅ include JWT token
+          Authorization: `Bearer ${token}`, // ✅ send token
         },
       });
 

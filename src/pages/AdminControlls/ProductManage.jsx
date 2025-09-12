@@ -17,7 +17,7 @@ export default function ProductManage() {
       if (!token) throw new Error("Unauthorized");
 
       const res = await API.get("/products", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }, // ✅ send JWT
       });
 
       setProducts(res.data.products || res.data);
@@ -43,7 +43,7 @@ export default function ProductManage() {
       if (!token) throw new Error("Unauthorized");
 
       await API.delete(`/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }, // ✅ send JWT
       });
 
       toast.success("Product deleted successfully");
