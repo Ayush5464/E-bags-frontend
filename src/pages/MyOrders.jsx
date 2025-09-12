@@ -1,7 +1,8 @@
+// src/pages/MyOrders.jsx
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
 import { useAuthStore } from "../store/useAuthStore";
 import API from "../api/axios";
+import { toast } from "react-hot-toast";
 
 export default function MyOrders() {
   const { user } = useAuthStore();
@@ -10,19 +11,11 @@ export default function MyOrders() {
 
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Unauthorized");
-
-      const res = await API.get("/orders/my-orders", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
+      const res = await API.get("/orders/my-orders"); // matches your backend route
       setOrders(res.data);
     } catch (err) {
-      console.error("Fetch orders failed:", err);
-      toast.error("Failed to fetch your orders.");
+      toast.error("Failed to fetch your orders");
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -33,12 +26,9 @@ export default function MyOrders() {
   }, [user]);
 
   if (loading) return <p className="p-4">Loading your orders...</p>;
-
-  if (!orders || orders.length === 0)
+  if (!orders.length)
     return (
-      <div className="p-4 text-gray-600">
-        You haven’t placed any orders yet.
-      </div>
+      <p className="p-4 text-gray-500">You haven’t placed any orders yet.</p>
     );
 
   return (
@@ -51,7 +41,7 @@ export default function MyOrders() {
               <th className="p-3 text-left">#</th>
               <th className="p-3 text-left">Order ID</th>
               <th className="p-3 text-left">Date</th>
-              <th className="p-3 text-left">Total</th>
+              <th className="p-3 text-left">Total Amount</th>
               <th className="p-3 text-left">Status</th>
             </tr>
           </thead>
@@ -59,7 +49,7 @@ export default function MyOrders() {
             {orders.map((order, idx) => (
               <tr key={order._id} className="border-b hover:bg-gray-50">
                 <td className="p-3">{idx + 1}</td>
-                <td className="p-3 text-sm">{order._id}</td>
+                <td className="p-3">{order._id}</td>
                 <td className="p-3">
                   {new Date(order.createdAt).toLocaleDateString()}
                 </td>
