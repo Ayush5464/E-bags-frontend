@@ -9,7 +9,7 @@ const BASE_URL = "https://e-bags-backend.onrender.com";
 
 // Helper to generate correct image URL
 const getImageUrl = (path) => {
-  if (!path) return "";
+  if (!path) return ""; // safety check
   if (path.startsWith("http")) return path; // already full URL
   return path.startsWith("/uploads/")
     ? `${BASE_URL}${path}`
@@ -26,10 +26,9 @@ export default function ProductDetails() {
     API.get(`/products/${id}`)
       .then((res) => {
         setProduct(res.data);
-        // Set main image to first image in array
-        setMainImage(res.data.images?.[0] || res.data.image || "");
+        setMainImage(res.data.images?.[0] || res.data.image);
       })
-      .catch((err) => console.error("Failed to fetch product:", err));
+      .catch((err) => console.error(err));
   }, [id]);
 
   if (!product)
@@ -43,9 +42,9 @@ export default function ProductDetails() {
     <div className="max-w-5xl mx-auto mt-8 p-4">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-600 mb-4">
-        <Link to="/" className="hover:underline">
+        <a href="/" className="hover:underline">
           Home
-        </Link>{" "}
+        </a>{" "}
         /{" "}
         <Link to="/products" className="hover:underline">
           Products

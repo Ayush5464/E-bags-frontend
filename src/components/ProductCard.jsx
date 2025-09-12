@@ -3,15 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 const BASE_URL = "https://e-bags-backend.onrender.com";
 
-// Helper to generate correct image URL
-const getImageUrl = (path) => {
-  if (!path) return ""; // safety
-  if (path.startsWith("http")) return path; // full URL already
-  return path.startsWith("/uploads/")
-    ? `${BASE_URL}${path}`
-    : `${BASE_URL}/uploads/${path}`;
-};
-
 export default function ProductCard({ product }) {
   const addToCart = useCartStore((state) => state.addToCart);
   const navigate = useNavigate();
@@ -29,7 +20,7 @@ export default function ProductCard({ product }) {
     >
       <div className="p-5">
         <img
-          src={getImageUrl(product.images?.[0] || product.image)}
+          src={`${BASE_URL}${product.images?.[0] || product.image}`}
           alt={product.name}
           className="h-48 w-full object-cover"
         />
