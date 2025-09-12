@@ -8,6 +8,7 @@ import {
   X,
   Bell,
   LogOut,
+  PackagePlus,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -55,6 +56,11 @@ export default function AdminLayout({ children, pageTitle = "Admin" }) {
             to="/admin/product"
             icon={<Package size={18} />}
             label="Products"
+          />
+          <NavLink
+            to="/admin/uploads"
+            icon={<PackagePlus size={18} />}
+            label="Add Product"
           />
           <NavLink
             to="/admin/orders"

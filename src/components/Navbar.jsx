@@ -106,9 +106,9 @@ export default function Navbar() {
                 <NavLink to="/admin" onClick={() => setMobileMenuOpen(false)}>
                   Dashboard
                 </NavLink>
-                <NavLink to="/admin/uploads" onClick={() => setMobileMenuOpen(false)}>
+                {/* <NavLink to="/admin/uploads" onClick={() => setMobileMenuOpen(false)}>
                   Add Product
-                </NavLink>
+                </NavLink> */}
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-1 text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition text-sm"
