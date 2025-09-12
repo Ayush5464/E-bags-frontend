@@ -122,12 +122,19 @@ export default function ProductManage() {
                   <td className="p-3">{idx + 1}</td>
                   <td className="p-3">
                     {editingProductId === product._id ? (
-                      <input
-                        type="file"
-                        name="images"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                      />
+                      <label className="cursor-pointer inline-block relative group">
+                        <Edit
+                          size={20}
+                          className="text-indigo-600 group-hover:scale-110 transition"
+                        />
+                        <input
+                          type="file"
+                          name="images"
+                          accept="image/*"
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          onChange={handleImageChange}
+                        />
+                      </label>
                     ) : product.images?.[0] ? (
                       <img
                         src={`https://e-bags-backend.onrender.com${product.images[0]}`}
@@ -138,6 +145,7 @@ export default function ProductManage() {
                       "No Image"
                     )}
                   </td>
+
                   {editingProductId === product._id ? (
                     <>
                       <td className="p-3">
