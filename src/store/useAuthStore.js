@@ -1,12 +1,15 @@
+// store/useAuthStore.js
 import { create } from "zustand";
 import API from "../api/axios";
 
 export const useAuthStore = create((set) => ({
     user: null,
-    loading: true, // added loading state
+    loading: true,
 
+    // ✅ 1. Fetch user from token on refresh
     fetchCurrentUser: async () => {
         set({ loading: true });
+
         try {
             const token = localStorage.getItem("token");
             if (!token) {
@@ -20,26 +23,29 @@ export const useAuthStore = create((set) => ({
 
             set({ user: res.data.user, loading: false });
         } catch (err) {
+            console.error("Fetch current user failed:", err);
             set({ user: null, loading: false });
         }
     },
 
+    // ✅ 2. Login
     login: async (email, password) => {
         const res = await API.post("/auth/login", { email, password });
-        const user = res.data.user;
-        const token = res.data.token; // make sure backend returns JWT
-        localStorage.setItem("token", token); // save token
+
+        const { user, token } = res.data;
+        localStorage.setItem("token", token);
         set({ user });
         return user;
     },
 
+    // ✅ 3. Register
     register: async (formData) => {
         await API.post("/auth/signup", formData);
     },
 
-    logout: async () => {
-        await API.post("/auth/logout");
-        localStorage.removeItem("token");
+    // ✅ 4. Logout
+    logout: () => {
+        localStorage.removeItem("token"); // No need to call backend logout
         set({ user: null });
     },
 }));
