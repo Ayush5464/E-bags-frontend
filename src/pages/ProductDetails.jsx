@@ -33,7 +33,7 @@ export default function ProductDetails() {
 
   if (!product)
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-800">
+      <div className="flex items-center justify-center h-screen bg-gray-100">
         <Loader2 className="animate-spin text-gray-400" size={48} />
       </div>
     );
