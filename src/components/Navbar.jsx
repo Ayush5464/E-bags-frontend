@@ -35,6 +35,7 @@ export default function Navbar() {
                   <User2 />
                   {user.name}
                 </div>
+                <NavLink to="/admin">Dashboard</NavLink>
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-1 text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition text-sm"
@@ -49,7 +50,6 @@ export default function Navbar() {
                   <User2 />
                   {user.name}
                 </div>
-
                 <NavLink to="/">Home</NavLink>
                 <NavLink to="/products">Products</NavLink>
                 <NavLink to="/my-orders">My Orders</NavLink>
