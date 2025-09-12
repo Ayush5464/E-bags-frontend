@@ -1,9 +1,9 @@
 // pages/AdminControlls/AdminUserManage.jsx
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import API from "../../api/axios";
 import { Trash2, ShieldCheck, ShieldX } from "lucide-react";
 import AdminLayout from "./AdminLayout";
+import API from "../../api/axios";
 
 export default function AdminUserManage() {
   const [users, setUsers] = useState([]);
