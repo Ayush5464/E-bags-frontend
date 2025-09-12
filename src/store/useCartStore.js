@@ -9,9 +9,9 @@ export const useCartStore = create((set) => ({
     fetchCart: async () => {
         set({ loading: true });
         try {
-            const token = localStorage.getItem("token"); // ✅ Get JWT from localStorage
+            const token = localStorage.getItem("token");
             const res = await API.get("/cart", {
-                headers: { Authorization: `Bearer ${token}` }, // ✅ Send token in header
+                headers: { Authorization: `Bearer ${token}` },
             });
             set({ cart: res.data });
         } catch (err) {
@@ -28,7 +28,7 @@ export const useCartStore = create((set) => ({
             await API.post(
                 "/cart",
                 { product, quantity },
-                { headers: { Authorization: `Bearer ${token}` } } // ✅ Send token
+                { headers: { Authorization: `Bearer ${token}` } }
             );
             await useCartStore.getState().fetchCart();
             toast.success("Added to cart!");

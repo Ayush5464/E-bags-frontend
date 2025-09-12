@@ -1,5 +1,6 @@
 // pages/AdminDashboard.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminLayout from "./AdminControlls/AdminLayout";
 import API from "../api/axios";
 import toast from "react-hot-toast";
@@ -7,47 +8,55 @@ import toast from "react-hot-toast";
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem("token"); // ✅ get JWT
+        const token = localStorage.getItem("token");
         if (!token) throw new Error("Unauthorized");
 
         const res = await API.get("/admin/stats", {
-          headers: { Authorization: `Bearer ${token}` }, // ✅ send token
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         setStats(res.data);
       } catch (err) {
         console.error("Failed to fetch stats:", err);
-        toast.error("Failed to fetch stats. Make sure you are an admin.");
+        toast.error(
+          "Failed to fetch stats. Make sure you are logged in as admin."
+        );
+
+        // Redirect non-admin or unauthorized user to homepage
+        navigate("/");
       } finally {
         setLoading(false);
       }
     };
 
     fetchStats();
-  }, []);
+  }, [navigate]);
 
   if (loading)
     return (
       <AdminLayout>
-        <p className="p-6">Loading...</p>
+        <div className="p-6 text-center text-gray-600">Loading stats...</div>
       </AdminLayout>
     );
 
   if (!stats)
     return (
       <AdminLayout>
-        <p className="p-6">No data available.</p>
+        <div className="p-6 text-center text-gray-600">No data available.</div>
       </AdminLayout>
     );
 
   return (
     <AdminLayout>
       <main className="p-6">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Overview</h2>
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">
+          Admin Dashboard
+        </h2>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
