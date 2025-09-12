@@ -2,6 +2,9 @@ import { useEffect } from "react";
 import { useCartStore } from "../store/useCartStore";
 import { useNavigate, Link } from "react-router-dom";
 
+// Backend base URL
+const BASE_URL = "https://e-bags-backend.onrender.com";
+
 export default function Cart() {
   const { cart, fetchCart, removeFromCart, clearCart, loading } =
     useCartStore();
@@ -11,7 +14,12 @@ export default function Cart() {
     fetchCart();
   }, []);
 
-  if (loading) return <p className="p-4">Loading cart...</p>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-800">
+        <p className="text-gray-400">Loading cart...</p>
+      </div>
+    );
 
   if (!cart || cart.items.length === 0) {
     return (
@@ -26,9 +34,13 @@ export default function Cart() {
     0
   );
 
+  // Helper to build full image URL
+  const getImageUrl = (path) =>
+    path?.startsWith("http") ? path : `${BASE_URL}/uploads/${path}`;
+
   return (
-    <div className="min-h-screen bg-gray-800 py-8 px-4">
-      <div className="max-w-3xl mx-auto bg-gray-300 p-6 rounded-lg shadow">
+    <div className="min-h-screen bg-gray-100 py-8 px-4">
+      <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow">
         {/* Breadcrumb */}
         <nav className="text-sm text-gray-600 mb-6">
           <Link to="/" className="hover:underline">
@@ -45,13 +57,23 @@ export default function Cart() {
               key={item.product._id}
               className="py-4 flex justify-between items-center"
             >
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800">
-                  {item.product.name}
-                </h2>
-                <p className="text-gray-600">Price: ₹{item.product.price}</p>
-                <p className="text-gray-600">Qty: {item.quantity}</p>
+              <div className="flex items-center gap-4">
+                <img
+                  src={getImageUrl(
+                    item.product.images?.[0] || item.product.image
+                  )}
+                  alt={item.product.name}
+                  className="w-20 h-20 object-cover rounded"
+                />
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {item.product.name}
+                  </h2>
+                  <p className="text-gray-600">Price: ₹{item.product.price}</p>
+                  <p className="text-gray-600">Qty: {item.quantity}</p>
+                </div>
               </div>
+
               <button
                 onClick={() => removeFromCart(item.product._id)}
                 className="text-red-600 hover:underline text-sm"
@@ -77,7 +99,7 @@ export default function Cart() {
 
             <button
               onClick={() => navigate("/checkout")}
-              className="bg-blue-600 text-white px-4 py-2 rounded w-full mt-4"
+              className="bg-blue-600 text-white px-4 py-2 rounded w-full sm:w-auto"
             >
               Buy Now
             </button>
