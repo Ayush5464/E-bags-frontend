@@ -14,30 +14,32 @@ export default function Navbar() {
     cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
   const handleLogout = () => {
-    logout(); // clear user state & cookies
-    navigate("/login"); // redirect to login page
+    logout();
+    navigate("/login");
     setMobileMenuOpen(false);
   };
 
   return (
-    <nav className="bg-white shadow border-b border-gray-200">
+    <nav className="bg-white shadow-md border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold text-blue-600">
+        <Link to="/" className="text-2xl font-bold text-blue-700">
           EbagMart
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-700">
+        <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-800">
           {user ? (
             user.isAdmin ? (
               <>
-                <User2 />
-                <span className="text-blue-600 font-semibold">{user.name}</span>
-                <Link to="/admin">Dashboard</Link>
-                <Link to="/admin/uploads">Add Product</Link>
+                <div className="flex items-center gap-1 text-gray-800 font-semibold">
+                  <User2 />
+                  {user.name}
+                </div>
+                <NavLink to="/admin">Dashboard</NavLink>
+                <NavLink to="/admin/uploads">Add Product</NavLink>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-1 text-red-500 hover:text-red-600 px-3 py-1 rounded transition text-sm"
+                  className="flex items-center gap-1 text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition text-sm"
                 >
                   <LogOut size={16} />
                   Logout
@@ -45,27 +47,15 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <div className="flex items-center gap-1 text-blue-600">
+                <div className="flex items-center gap-1 text-gray-800 font-semibold">
                   <User2 />
-                  <span className="text-blue-600 font-semibold">
-                    {user.name}
-                  </span>
+                  {user.name}
                 </div>
-                <Link
-                  to="/products"
-                  className="no-underline text-gray-700 hover:text-blue-600"
-                >
-                  Products
-                </Link>
-                <Link
-                  to="/orders"
-                  className="no-underline text-gray-700 hover:text-blue-600"
-                >
-                  My Orders
-                </Link>
+                <NavLink to="/products">Products</NavLink>
+                <NavLink to="/my-orders">My Orders</NavLink>
                 <Link
                   to="/cart"
-                  className="relative flex items-center gap-1 hover:text-blue-600"
+                  className="relative flex items-center gap-1 text-gray-800 hover:text-blue-600 transition"
                 >
                   <ShoppingBag size={18} />
                   Cart
@@ -77,7 +67,7 @@ export default function Navbar() {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition text-sm flex items-center gap-1"
+                  className="flex items-center gap-1 text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition text-sm"
                 >
                   <LogOut size={16} />
                   Logout
@@ -96,7 +86,7 @@ export default function Navbar() {
         <div className="md:hidden flex items-center">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-gray-700 hover:text-blue-600 focus:outline-none"
+            className="text-gray-800 hover:text-blue-600 focus:outline-none"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -109,27 +99,19 @@ export default function Navbar() {
           {user ? (
             user.isAdmin ? (
               <>
-                <div className="flex items-center gap-1 text-blue-600">
+                <div className="flex items-center gap-1 text-gray-800 font-semibold">
                   <User2 />
-                  <span className="font-semibold">{user.name}</span>
+                  {user.name}
                 </div>
-                <Link
-                  to="/admin"
-                  className="block text-gray-700 hover:text-blue-600"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+                <NavLink to="/admin" onClick={() => setMobileMenuOpen(false)}>
                   Dashboard
-                </Link>
-                <Link
-                  to="/admin/uploads"
-                  className="block text-gray-700 hover:text-blue-600"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+                </NavLink>
+                <NavLink to="/admin/uploads" onClick={() => setMobileMenuOpen(false)}>
                   Add Product
-                </Link>
+                </NavLink>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-1 text-red-500 hover:text-red-600 px-3 py-1 rounded transition text-sm"
+                  className="flex items-center gap-1 text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition text-sm"
                 >
                   <LogOut size={16} />
                   Logout
@@ -137,27 +119,19 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <div className="flex items-center gap-1 text-blue-600 ">
+                <div className="flex items-center gap-1 text-gray-800 font-semibold">
                   <User2 />
-                  <span className="font-semibold">{user.name}</span>
+                  {user.name}
                 </div>
-                <Link
-                  to="/products"
-                  className="block text-gray-700 hover:text-blue-600 no-underline"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+                <NavLink to="/products" onClick={() => setMobileMenuOpen(false)}>
                   Products
-                </Link>
-                <Link
-                  to="/my-orders"
-                  className="block text-gray-700 hover:text-blue-600 no-underline"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+                </NavLink>
+                <NavLink to="/my-orders" onClick={() => setMobileMenuOpen(false)}>
                   My Orders
-                </Link>
+                </NavLink>
                 <Link
                   to="/cart"
-                  className="flex items-center gap-1 text-gray-700 hover:text-blue-600 no-underline"
+                  className="relative flex items-center gap-1 text-gray-800 hover:text-blue-600 transition"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <ShoppingBag size={18} />
@@ -170,7 +144,7 @@ export default function Navbar() {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition text-sm flex items-center gap-1"
+                  className="flex items-center gap-1 text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition text-sm"
                 >
                   <LogOut size={16} />
                   Logout
@@ -198,7 +172,7 @@ function NavLink({ to, children, onClick }) {
     <Link
       to={to}
       onClick={onClick}
-      className="block text-gray-700 hover:text-blue-600 transition duration-150"
+      className="text-gray-800 hover:text-blue-600 transition font-medium"
     >
       {children}
     </Link>
