@@ -1,7 +1,7 @@
 // src/pages/AdminControlls/ProductManage.jsx
 
 import { useEffect, useState } from "react";
-import { Edit, Save, Trash2, X } from "lucide-react";
+import { Edit, Save, Trash2, X, Image as ImageIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import API from "../../api/axios";
 import AdminLayout from "./AdminLayout";
@@ -10,7 +10,6 @@ export default function ProductManage() {
   const [products, setProducts] = useState([]);
   const [editingProductId, setEditingProductId] = useState(null);
   const [form, setForm] = useState({});
-  const [newImage, setNewImage] = useState(null);
 
   const fetchProducts = async () => {
     try {
@@ -47,14 +46,13 @@ export default function ProductManage() {
       price: product.price,
       category: product.category,
       countInStock: product.countInStock,
+      images: [],
     });
-    setNewImage(null);
   };
 
   const handleCancel = () => {
     setEditingProductId(null);
     setForm({});
-    setNewImage(null);
   };
 
   const handleInputChange = (e) => {
@@ -62,20 +60,23 @@ export default function ProductManage() {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) setNewImage(file);
+    setForm((prevForm) => ({
+      ...prevForm,
+      images: e.target.files, // FileList (multiple files)
+    }));
   };
 
   const handleUpdate = async (id) => {
     try {
       const formData = new FormData();
       for (let key in form) {
-        formData.append(key, form[key]);
-      }
-
-      // if new image is selected, include it in formData
-      if (newImage) {
-        formData.append("images", newImage);
+        if (key === "images") {
+          for (let file of form.images) {
+            formData.append("images", file);
+          }
+        } else {
+          formData.append(key, form[key]);
+        }
       }
 
       await API.put(`/products/${id}`, formData, {
@@ -87,12 +88,10 @@ export default function ProductManage() {
 
       toast.success("Product updated");
       setEditingProductId(null);
-      setForm({});
-      setNewImage(null);
       fetchProducts();
     } catch (err) {
-      console.error(err);
       toast.error("Update failed");
+      console.error(err);
     }
   };
 
@@ -120,14 +119,25 @@ export default function ProductManage() {
               {products.map((product, idx) => (
                 <tr key={product._id} className="border-b hover:bg-gray-50">
                   <td className="p-3">{idx + 1}</td>
+
+                  {/* Editable Image Cell */}
                   <td className="p-3">
                     {editingProductId === product._id ? (
-                      <input
-                        type="file"
-                        name="images"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                      />
+                      <label className="cursor-pointer inline-block relative group">
+                        <ImageIcon
+                          size={20}
+                          className="text-indigo-600 group-hover:scale-110 transition"
+                          title="Change Images"
+                        />
+                        <input
+                          type="file"
+                          name="images"
+                          accept="image/*"
+                          multiple
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          onChange={handleImageChange}
+                        />
+                      </label>
                     ) : product.images?.[0] ? (
                       <img
                         src={`https://e-bags-backend.onrender.com${product.images[0]}`}
@@ -138,6 +148,8 @@ export default function ProductManage() {
                       "No Image"
                     )}
                   </td>
+
+                  {/* Editable Fields */}
                   {editingProductId === product._id ? (
                     <>
                       <td className="p-3">
