@@ -13,6 +13,12 @@ export default function ProductCard({ product }) {
     addToCart(product._id, 1);
   };
 
+  // Build the full image URL
+  const imagePath = product.images?.[0] || product.image;
+  const imageUrl = imagePath?.startsWith("http")
+    ? imagePath
+    : `${BASE_URL}/uploads/${imagePath}`;
+
   return (
     <div
       onClick={handleCardClick}
@@ -20,7 +26,7 @@ export default function ProductCard({ product }) {
     >
       <div className="p-5">
         <img
-          src={`${BASE_URL}${product.images?.[0] || product.image}`}
+          src={imageUrl}
           alt={product.name}
           className="h-48 w-full object-cover"
         />
