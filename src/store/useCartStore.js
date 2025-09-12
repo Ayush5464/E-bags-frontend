@@ -9,10 +9,7 @@ export const useCartStore = create((set) => ({
     fetchCart: async () => {
         set({ loading: true });
         try {
-            const token = localStorage.getItem("token"); // get JWT from localStorage
-            const res = await API.get("/cart", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            const res = await API.get("/cart", { withCredentials: true }); // ✅ include cookies
             set({ cart: res.data });
         } catch (err) {
             toast.error("Failed to fetch cart");
@@ -24,11 +21,10 @@ export const useCartStore = create((set) => ({
 
     addToCart: async (product, quantity = 1) => {
         try {
-            const token = localStorage.getItem("token");
             await API.post(
                 "/cart",
                 { product, quantity },
-                { headers: { Authorization: `Bearer ${token}` } }
+                { withCredentials: true } // ✅ include cookies
             );
             await useCartStore.getState().fetchCart();
             toast.success("Added to cart!");
@@ -40,10 +36,7 @@ export const useCartStore = create((set) => ({
 
     removeFromCart: async (productId) => {
         try {
-            const token = localStorage.getItem("token");
-            await API.delete(`/cart/${productId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            await API.delete(`/cart/${productId}`, { withCredentials: true }); // ✅ include cookies
             await useCartStore.getState().fetchCart();
             toast.success("Removed from cart");
         } catch (err) {
@@ -54,10 +47,7 @@ export const useCartStore = create((set) => ({
 
     clearCart: async () => {
         try {
-            const token = localStorage.getItem("token");
-            await API.delete("/cart", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            await API.delete("/cart", { withCredentials: true }); // ✅ include cookies
             await useCartStore.getState().fetchCart();
             toast.success("Cart cleared");
         } catch (err) {
