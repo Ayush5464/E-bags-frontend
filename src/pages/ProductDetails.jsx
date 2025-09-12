@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import API from "../api/axios";
 import { useCartStore } from "../store/useCartStore";
+import { Loader2 } from "lucide-react";
 
 // ✅ Set correct backend base URL
 const BASE_URL = "https://e-bags-backend.onrender.com";
@@ -21,7 +22,12 @@ export default function ProductDetails() {
       .catch((err) => console.error(err));
   }, [id]);
 
-  if (!product) return <p className="p-4">Loading product...</p>;
+  if (!product)
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-800">
+        <Loader2 className="animate-spin text-gray-400" size={48} />
+      </div>
+    );
 
   // ✅ Build full image URL
   const getImageUrl = (imagePath) =>
