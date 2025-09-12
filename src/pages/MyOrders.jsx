@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
-import { useAuthStore } from "../store/useAuthStore";
 import API from "../api/axios";
 import { toast } from "react-hot-toast";
-import { Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 
 export default function MyOrders() {
   const { user } = useAuthStore();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   const fetchOrders = async () => {
     try {
@@ -24,12 +21,8 @@ export default function MyOrders() {
 
       setOrders(res.data);
     } catch (err) {
-      console.error("Error fetching orders:", err);
-      toast.error("Failed to fetch your orders");
-
-      if (err.response?.status === 401) {
-        navigate("/login");
-      }
+      console.error("Fetch orders failed:", err);
+      toast.error("Failed to fetch your orders.");
     } finally {
       setLoading(false);
     }
@@ -39,19 +32,12 @@ export default function MyOrders() {
     if (user) fetchOrders();
   }, [user]);
 
-  if (loading)
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="animate-spin text-gray-500" size={48} />
-      </div>
-    );
+  if (loading) return <p className="p-4">Loading your orders...</p>;
 
-  if (!orders.length)
+  if (!orders || orders.length === 0)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p className="text-gray-500 text-lg">
-          You haven’t placed any orders yet.
-        </p>
+      <div className="p-4 text-gray-600">
+        You haven’t placed any orders yet.
       </div>
     );
 
@@ -65,7 +51,7 @@ export default function MyOrders() {
               <th className="p-3 text-left">#</th>
               <th className="p-3 text-left">Order ID</th>
               <th className="p-3 text-left">Date</th>
-              <th className="p-3 text-left">Total Amount</th>
+              <th className="p-3 text-left">Total</th>
               <th className="p-3 text-left">Status</th>
             </tr>
           </thead>
@@ -73,7 +59,7 @@ export default function MyOrders() {
             {orders.map((order, idx) => (
               <tr key={order._id} className="border-b hover:bg-gray-50">
                 <td className="p-3">{idx + 1}</td>
-                <td className="p-3">{order._id}</td>
+                <td className="p-3 text-sm">{order._id}</td>
                 <td className="p-3">
                   {new Date(order.createdAt).toLocaleDateString()}
                 </td>
