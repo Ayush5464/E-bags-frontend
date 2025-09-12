@@ -1,5 +1,6 @@
+// pages/AdminControlls/AdminProductUpload.jsx
 import { useState } from "react";
-import API from "../api/axios";
+import API from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -19,12 +20,13 @@ export default function AdminProductUpload() {
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleImagesChange = (e) => {
-    setImages([...e.target.files]); // store multiple files
+    setImages([...e.target.files]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (images.length === 0) return alert("Please select at least one image");
+    if (images.length === 0)
+      return toast.error("Please select at least one image");
 
     const formData = new FormData();
     for (let key in form) {
@@ -35,18 +37,25 @@ export default function AdminProductUpload() {
       formData.append(key, value);
     }
 
-    images.forEach((img) => formData.append("images", img)); // append multiple images
+    images.forEach((img) => formData.append("images", img));
 
     setLoading(true);
     try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Unauthorized");
+
       await API.post("/products", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`, // ✅ include JWT token
+        },
       });
+
       toast.success("Product uploaded successfully!");
       navigate("/admin/uploads");
-      location.reload();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to upload product");
+      console.error("Upload failed:", err);
+      toast.error(err.response?.data?.message || "Failed to upload product");
     } finally {
       setLoading(false);
     }
