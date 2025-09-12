@@ -9,7 +9,7 @@ export const useCartStore = create((set) => ({
     fetchCart: async () => {
         set({ loading: true });
         try {
-            const res = await API.get("/cart", { withCredentials: true }); // ✅ include cookies
+            const res = await API.get("/cart", { withCredentials: true });
             set({ cart: res.data });
         } catch (err) {
             toast.error("Failed to fetch cart");
@@ -21,11 +21,7 @@ export const useCartStore = create((set) => ({
 
     addToCart: async (product, quantity = 1) => {
         try {
-            await API.post(
-                "/cart",
-                { product, quantity },
-                { withCredentials: true } // ✅ include cookies
-            );
+            await API.post("/cart", { product, quantity }, { withCredentials: true });
             await useCartStore.getState().fetchCart();
             toast.success("Added to cart!");
         } catch (err) {
@@ -36,7 +32,7 @@ export const useCartStore = create((set) => ({
 
     removeFromCart: async (productId) => {
         try {
-            await API.delete(`/cart/${productId}`, { withCredentials: true }); // ✅ include cookies
+            await API.delete(`/cart/${productId}`, { withCredentials: true });
             await useCartStore.getState().fetchCart();
             toast.success("Removed from cart");
         } catch (err) {
@@ -47,7 +43,7 @@ export const useCartStore = create((set) => ({
 
     clearCart: async () => {
         try {
-            await API.delete("/cart", { withCredentials: true }); // ✅ include cookies
+            await API.delete("/cart", { withCredentials: true });
             await useCartStore.getState().fetchCart();
             toast.success("Cart cleared");
         } catch (err) {
