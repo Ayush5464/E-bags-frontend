@@ -3,6 +3,9 @@ import { Link, useParams } from "react-router-dom";
 import API from "../api/axios";
 import { useCartStore } from "../store/useCartStore";
 
+// ✅ Set correct backend base URL
+const BASE_URL = "https://e-bags-backend.onrender.com";
+
 export default function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
@@ -20,6 +23,12 @@ export default function ProductDetails() {
 
   if (!product) return <p className="p-4">Loading product...</p>;
 
+  // ✅ Build full image URL
+  const getImageUrl = (imagePath) =>
+    imagePath?.startsWith("http")
+      ? imagePath
+      : `${BASE_URL}/uploads/${imagePath}`;
+
   return (
     <div className="max-w-5xl mx-auto mt-8 p-4">
       {/* Breadcrumb */}
@@ -28,7 +37,7 @@ export default function ProductDetails() {
           Home
         </a>{" "}
         /{" "}
-        <Link to={"/products"} className="hover:underline">
+        <Link to="/products" className="hover:underline">
           Products
         </Link>{" "}
         / <span className="text-gray-800 font-medium">{product.name}</span>
@@ -38,17 +47,17 @@ export default function ProductDetails() {
         {/* Main Image */}
         <div className="flex flex-col gap-2">
           <img
-            src={`http://localhost:5000${mainImage}`}
+            src={getImageUrl(mainImage)}
             alt={product.name}
             className="w-full md:w-96 h-96 object-cover rounded-lg"
           />
 
-          {/* Similar/Additional Images */}
-          <div className="flex gap-2 mt-2">
+          {/* Additional Images */}
+          <div className="flex gap-2 mt-2 flex-wrap">
             {product.images?.map((img, index) => (
               <img
                 key={index}
-                src={`http://localhost:5000${img}`}
+                src={getImageUrl(img)}
                 alt={`Product ${index + 1}`}
                 className={`w-20 h-20 object-cover rounded cursor-pointer border ${
                   mainImage === img ? "border-blue-600" : "border-gray-200"
