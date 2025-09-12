@@ -1,3 +1,4 @@
+// src/pages/Checkout.jsx
 import { useEffect, useState } from "react";
 import { useCartStore } from "../store/useCartStore";
 import API from "../api/axios";
@@ -15,7 +16,7 @@ export default function Checkout() {
     document.getElementById("shipping")?.focus();
   }, []);
 
-  if (!cart || cart.items.length === 0) {
+  if (!cart || !cart.items || cart.items.length === 0) {
     return <p className="p-4">Cart is empty.</p>;
   }
 
@@ -29,21 +30,32 @@ export default function Checkout() {
 
     setLoading(true);
     try {
-      await API.post("/orders", {
-        shippingAddress: address,
-        totalAmount: total,
-        items: cart.items.map((item) => ({
-          product: item.product._id,
-          quantity: item.quantity,
-        })),
-      });
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Unauthorized");
+
+      await API.post(
+        "/orders",
+        {
+          shippingAddress: address,
+          totalAmount: total,
+          items: cart.items.map((item) => ({
+            product: item.product._id,
+            quantity: item.quantity,
+          })),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // ✅ pass token here
+          },
+        }
+      );
 
       await clearCart();
       toast.success("Order placed successfully!");
       navigate("/thankyou");
     } catch (err) {
+      console.error("Order placement error:", err);
       toast.error("Failed to place order");
-      // console.error(err);
     } finally {
       setLoading(false);
     }
@@ -51,7 +63,7 @@ export default function Checkout() {
 
   return (
     <div className="max-w-2xl mx-auto mt-8 p-6 border rounded shadow">
-      {/*  Fixed Breadcrumb */}
+      {/* Breadcrumb */}
       <nav className="text-sm text-gray-600 mb-6">
         <Link to="/" className="hover:underline">
           Home
@@ -86,6 +98,7 @@ export default function Checkout() {
         onChange={(e) => setAddress(e.target.value)}
         rows={3}
       />
+
       <div className="mb-4 gap-2">
         <input
           type="radio"
@@ -119,10 +132,8 @@ export default function Checkout() {
         </div>
         <div className="mt-4 flex items-start">
           <input type="checkbox" id="terms" className="mr-2" />
-          <label htmlFor="terms" className="text-lg text-gray-500">
-            <p className="text-sm text-gray-500 mb-4">
-              By placing your order, you agree to our Terms & Conditions.
-            </p>
+          <label htmlFor="terms" className="text-sm text-gray-500">
+            By placing your order, you agree to our Terms & Conditions.
           </label>
         </div>
       </div>
