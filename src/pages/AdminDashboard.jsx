@@ -2,16 +2,32 @@
 import React, { useEffect, useState } from "react";
 import AdminLayout from "./AdminControlls/AdminLayout";
 import API from "../api/axios";
+import toast from "react-hot-toast";
 
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    API.get("/admin/stats")
-      .then((res) => setStats(res.data))
-      .catch((err) => console.error("Failed to fetch stats:", err))
-      .finally(() => setLoading(false));
+    const fetchStats = async () => {
+      try {
+        const token = localStorage.getItem("token"); // ✅ get JWT
+        if (!token) throw new Error("Unauthorized");
+
+        const res = await API.get("/admin/stats", {
+          headers: { Authorization: `Bearer ${token}` }, // ✅ send token
+        });
+
+        setStats(res.data);
+      } catch (err) {
+        console.error("Failed to fetch stats:", err);
+        toast.error("Failed to fetch stats. Make sure you are an admin.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
   }, []);
 
   if (loading)
@@ -20,6 +36,7 @@ function AdminDashboard() {
         <p className="p-6">Loading...</p>
       </AdminLayout>
     );
+
   if (!stats)
     return (
       <AdminLayout>
