@@ -1,21 +1,15 @@
+// src/pages/AdminControlls/ProductManage.jsx
+
 import { useEffect, useState } from "react";
-import { Edit, Plus, Trash2 } from "lucide-react";
+import { Edit, Save, Trash2, X } from "lucide-react";
 import toast from "react-hot-toast";
 import API from "../../api/axios";
 import AdminLayout from "./AdminLayout";
 
 export default function ProductManage() {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [editingProduct, setEditingProduct] = useState(null);
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    price: "",
-    category: "",
-    countInStock: "",
-    images: [],
-  });
+  const [editingProductId, setEditingProductId] = useState(null);
+  const [form, setForm] = useState({});
 
   const fetchProducts = async () => {
     try {
@@ -24,8 +18,6 @@ export default function ProductManage() {
     } catch (err) {
       toast.error("Failed to fetch products");
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -46,204 +38,156 @@ export default function ProductManage() {
     }
   };
 
-  const handleInputChange = (e) => {
-    if (e.target.name === "images") {
-      setForm({ ...form, images: e.target.files });
-    } else {
-      setForm({ ...form, [e.target.name]: e.target.value });
-    }
-  };
-
   const handleEdit = (product) => {
-    setEditingProduct(product);
+    setEditingProductId(product._id);
     setForm({
       name: product.name,
       description: product.description,
       price: product.price,
       category: product.category,
       countInStock: product.countInStock,
-      images: [],
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
+  const handleCancel = () => {
+    setEditingProductId(null);
+    setForm({});
+  };
 
-    for (let key in form) {
-      if (key === "images") {
-        for (let file of form.images) {
-          formData.append("images", file);
-        }
-      } else {
-        formData.append(key, form[key]);
-      }
-    }
+  const handleInputChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
+  const handleUpdate = async (id) => {
     try {
-      if (editingProduct) {
-        await API.put(`/products/${editingProduct._id}`, formData, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        toast.success("Product updated");
-      } else {
-        await API.post("/products", formData, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        toast.success("Product created");
-      }
-      setForm({
-        name: "",
-        description: "",
-        price: "",
-        category: "",
-        countInStock: "",
-        images: [],
+      await API.put(`/products/${id}`, form, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
-      setEditingProduct(null);
+      toast.success("Product updated");
+      setEditingProductId(null);
       fetchProducts();
     } catch (err) {
-      toast.error("Failed to save product");
+      toast.error("Update failed");
     }
   };
 
   return (
     <AdminLayout>
       <div className="p-6 bg-gray-100 min-h-screen">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-800">Manage Products</h1>
-        </div>
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">
+          Manage Products
+        </h1>
 
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-4 mb-6 rounded shadow space-y-4"
-          encType="multipart/form-data"
-        >
-          <h2 className="text-lg font-semibold">
-            {editingProduct ? "Edit Product" : "Add New Product"}
-          </h2>
-
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleInputChange}
-            placeholder="Name"
-            className="w-full p-2 border rounded"
-            required
-          />
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleInputChange}
-            placeholder="Description"
-            className="w-full p-2 border rounded"
-            rows={3}
-          ></textarea>
-          <input
-            type="number"
-            name="price"
-            value={form.price}
-            onChange={handleInputChange}
-            placeholder="Price"
-            className="w-full p-2 border rounded"
-            required
-          />
-          <input
-            type="text"
-            name="category"
-            value={form.category}
-            onChange={handleInputChange}
-            placeholder="Category"
-            className="w-full p-2 border rounded"
-            required
-          />
-          <input
-            type="number"
-            name="countInStock"
-            value={form.countInStock}
-            onChange={handleInputChange}
-            placeholder="Stock"
-            className="w-full p-2 border rounded"
-            required
-          />
-          <input
-            type="file"
-            name="images"
-            multiple
-            accept="image/*"
-            onChange={handleInputChange}
-            className="w-full"
-          />
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            {editingProduct ? "Update" : "Create"}
-          </button>
-        </form>
-
-        {loading ? (
-          <p>Loading products...</p>
-        ) : (
-          <div className="overflow-x-auto bg-white rounded shadow">
-            <table className="w-full table-auto border-collapse">
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="p-3 text-left">#</th>
-                  <th className="p-3 text-left">Image</th>
-                  <th className="p-3 text-left">Name</th>
-                  <th className="p-3 text-left">Category</th>
-                  <th className="p-3 text-left">Price</th>
-                  <th className="p-3 text-left">Stock</th>
-                  <th className="p-3 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((product, idx) => (
-                  <tr key={product._id} className="border-b hover:bg-gray-50">
-                    <td className="p-3">{idx + 1}</td>
-                    <td className="p-3">
-                      {product.images?.[0] ? (
-                        <img
-                          src={`https://e-bags-backend.onrender.com${product.images[0]}`}
-                          alt={product.name}
-                          className="w-16 h-16 object-cover rounded"
+        <div className="overflow-x-auto bg-white rounded shadow">
+          <table className="w-full table-auto border-collapse">
+            <thead className="bg-gray-200">
+              <tr>
+                <th className="p-3 text-left">#</th>
+                <th className="p-3 text-left">Image</th>
+                <th className="p-3 text-left">Name</th>
+                <th className="p-3 text-left">Category</th>
+                <th className="p-3 text-left">Price</th>
+                <th className="p-3 text-left">Stock</th>
+                <th className="p-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product, idx) => (
+                <tr key={product._id} className="border-b hover:bg-gray-50">
+                  <td className="p-3">{idx + 1}</td>
+                  <td className="p-3">
+                    {product.images?.[0] ? (
+                      <img
+                        src={`https://e-bags-backend.onrender.com${product.images[0]}`}
+                        alt={product.name}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                    ) : (
+                      "No Image"
+                    )}
+                  </td>
+                  {editingProductId === product._id ? (
+                    <>
+                      <td className="p-3">
+                        <input
+                          name="name"
+                          value={form.name}
+                          onChange={handleInputChange}
+                          className="p-1 border w-full"
                         />
-                      ) : (
-                        "No Image"
-                      )}
-                    </td>
-                    <td className="p-3">{product.name}</td>
-                    <td className="p-3">{product.category}</td>
-                    <td className="p-3">₹{product.price}</td>
-                    <td className="p-3">{product.countInStock}</td>
-                    <td className="p-3 flex gap-3 justify-center">
-                      <button
-                        onClick={() => handleEdit(product)}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        <Edit size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(product._id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                      </td>
+                      <td className="p-3">
+                        <input
+                          name="category"
+                          value={form.category}
+                          onChange={handleInputChange}
+                          className="p-1 border w-full"
+                        />
+                      </td>
+                      <td className="p-3">
+                        <input
+                          type="number"
+                          name="price"
+                          value={form.price}
+                          onChange={handleInputChange}
+                          className="p-1 border w-full"
+                        />
+                      </td>
+                      <td className="p-3">
+                        <input
+                          type="number"
+                          name="countInStock"
+                          value={form.countInStock}
+                          onChange={handleInputChange}
+                          className="p-1 border w-full"
+                        />
+                      </td>
+                      <td className="p-3 flex justify-center gap-3">
+                        <button
+                          onClick={() => handleUpdate(product._id)}
+                          className="text-green-600 hover:text-green-800"
+                          title="Save"
+                        >
+                          <Save size={18} />
+                        </button>
+                        <button
+                          onClick={handleCancel}
+                          className="text-gray-600 hover:text-gray-800"
+                          title="Cancel"
+                        >
+                          <X size={18} />
+                        </button>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="p-3">{product.name}</td>
+                      <td className="p-3">{product.category}</td>
+                      <td className="p-3">₹{product.price}</td>
+                      <td className="p-3">{product.countInStock}</td>
+                      <td className="p-3 flex justify-center gap-3">
+                        <button
+                          onClick={() => handleEdit(product)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <Edit size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(product._id)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </td>
+                    </>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </AdminLayout>
   );
