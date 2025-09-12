@@ -15,7 +15,7 @@ export default function Checkout() {
     document.getElementById("shipping")?.focus();
   }, []);
 
-  if (!cart || cart.items.length === 0) {
+  if (!cart || !cart.items || cart.items.length === 0) {
     return <p className="p-4">Cart is empty.</p>;
   }
 
@@ -27,23 +27,32 @@ export default function Checkout() {
   const handlePlaceOrder = async () => {
     if (!address.trim()) return toast.error("Please enter shipping address");
 
+    const token = localStorage.getItem("token");
+    if (!token) return toast.error("You must be logged in to place an order");
+
     setLoading(true);
     try {
-      await API.post("/orders", {
-        shippingAddress: address,
-        totalAmount: total,
-        items: cart.items.map((item) => ({
-          product: item.product._id,
-          quantity: item.quantity,
-        })),
-      });
+      await API.post(
+        "/orders",
+        {
+          shippingAddress: address,
+          totalAmount: total,
+          items: cart.items.map((item) => ({
+            product: item.product._id,
+            quantity: item.quantity,
+          })),
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       await clearCart();
       toast.success("Order placed successfully!");
       navigate("/thankyou");
     } catch (err) {
-      toast.error("Failed to place order");
-      // console.error(err);
+      console.error("Order placement error:", err.response || err);
+      toast.error(err.response?.data?.message || "Failed to place order");
     } finally {
       setLoading(false);
     }
@@ -51,7 +60,6 @@ export default function Checkout() {
 
   return (
     <div className="max-w-2xl mx-auto mt-8 p-6 border rounded shadow">
-      {/*  Fixed Breadcrumb */}
       <nav className="text-sm text-gray-600 mb-6">
         <Link to="/" className="hover:underline">
           Home
@@ -86,46 +94,6 @@ export default function Checkout() {
         onChange={(e) => setAddress(e.target.value)}
         rows={3}
       />
-      <div className="mb-4 gap-2">
-        <input
-          type="radio"
-          id="payment-method-1"
-          name="payment-method"
-          value="credit-card"
-          className="mr-2"
-        />
-        <label htmlFor="payment-method-1" className="mr-4">
-          Credit Card
-        </label>
-
-        <input
-          type="radio"
-          id="payment-method-2"
-          name="payment-method"
-          value="paypal"
-          className="mr-2"
-        />
-        <label htmlFor="payment-method-2">PayPal</label>
-        <br />
-        <div className="mt-2">
-          <input
-            type="radio"
-            id="payment-method-3"
-            name="payment-method"
-            value="cash-on-delivery"
-            className="mr-2"
-          />
-          <label htmlFor="payment-method-3">Cash on Delivery</label>
-        </div>
-        <div className="mt-4 flex items-start">
-          <input type="checkbox" id="terms" className="mr-2" />
-          <label htmlFor="terms" className="text-lg text-gray-500">
-            <p className="text-sm text-gray-500 mb-4">
-              By placing your order, you agree to our Terms & Conditions.
-            </p>
-          </label>
-        </div>
-      </div>
 
       <button
         onClick={handlePlaceOrder}
@@ -137,3 +105,4 @@ export default function Checkout() {
     </div>
   );
 }
+  

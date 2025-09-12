@@ -1,4 +1,3 @@
-// src/pages/MyOrders.jsx
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import API from "../api/axios";
@@ -10,12 +9,22 @@ export default function MyOrders() {
   const [loading, setLoading] = useState(true);
 
   const fetchOrders = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("You must be logged in to view orders");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await API.get("/orders/my-orders"); // matches your backend route
+      const res = await API.get("/orders/my-orders", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setOrders(res.data);
     } catch (err) {
-      toast.error("Failed to fetch your orders");
-      console.error(err);
+      console.error("Failed to fetch orders:", err.response || err);
+      toast.error(err.response?.data?.message || "Failed to fetch your orders");
     } finally {
       setLoading(false);
     }
