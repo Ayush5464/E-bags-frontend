@@ -1,6 +1,15 @@
 import { useCartStore } from "../store/useCartStore";
 import { useNavigate } from "react-router-dom";
-import { getImageUrl } from "../utils/getImageUrl"; // import helper
+
+const BASE_URL = "https://e-bags-backend.onrender.com";
+
+// Helper function
+const getImageUrl = (img) => {
+  if (!img) return "";
+  return img.startsWith("http")
+    ? img
+    : `${BASE_URL}/uploads/${img.replace(/^\/uploads\//, "")}`;
+};
 
 export default function ProductCard({ product }) {
   const addToCart = useCartStore((state) => state.addToCart);
