@@ -1,14 +1,6 @@
 import { useCartStore } from "../store/useCartStore";
 import { useNavigate } from "react-router-dom";
-
-const BASE_URL = "https://e-bags-backend.onrender.com";
-
-// Helper to get full image URL
-const getImageUrl = (img) => {
-  if (!img) return "";
-  if (img.startsWith("http")) return img; // already full URL
-  return img.startsWith("/uploads/") ? `${BASE_URL}${img}` : `${BASE_URL}/uploads/${img}`;
-};
+import { getImageUrl } from "../utils/getImageUrl"; // import helper
 
 export default function ProductCard({ product }) {
   const addToCart = useCartStore((state) => state.addToCart);
@@ -34,9 +26,7 @@ export default function ProductCard({ product }) {
       </div>
       <div className="p-4 flex flex-col justify-between h-full">
         <div>
-          <h2 className="text-lg font-semibold text-gray-800">
-            {product.name}
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-800">{product.name}</h2>
           <p className="text-gray-600 text-sm mt-1">₹{product.price}</p>
           <p className="text-xs text-gray-400 mt-1">{product.category}</p>
         </div>
