@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { useCartStore } from "../store/useCartStore";
 import { useNavigate, Link } from "react-router-dom";
-import { Loader2 } from "lucide-react"; // ✅ import loader
+import { Loader2 } from "lucide-react";
+import API from "../api/axios";
+import toast from "react-hot-toast";
 
 export default function Cart() {
   const { cart, fetchCart, removeFromCart, clearCart, loading } =
@@ -19,7 +21,6 @@ export default function Cart() {
       </div>
     );
 
-  // ✅ Adjust cart structure
   const items = cart?.items || cart || [];
 
   if (!items || items.length === 0) {
@@ -35,10 +36,42 @@ export default function Cart() {
     0
   );
 
+  // ✅ Place Order
+  const placeOrder = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Unauthorized");
+
+      const orderData = {
+        items: items.map((item) => ({
+          productId: item.product._id,
+          quantity: item.quantity,
+        })),
+      };
+
+      await API.post("/orders", orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success("Order placed successfully!");
+      clearCart();
+      navigate("/orders/my-orders");
+    } catch (err) {
+      console.error("Order placement error:", err);
+      toast.error(
+        err.response?.data?.message || "Failed to place order. Please login."
+      );
+      if (err.response?.status === 401) {
+        navigate("/login");
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-800 py-8 px-4">
       <div className="max-w-3xl mx-auto bg-gray-300 p-6 rounded-lg shadow">
-        {/* Breadcrumb */}
         <nav className="text-sm text-gray-600 mb-6">
           <Link to="/" className="hover:underline">
             Home
@@ -85,7 +118,7 @@ export default function Cart() {
             </button>
 
             <button
-              onClick={() => navigate("/checkout")}
+              onClick={placeOrder}
               className="bg-blue-600 text-white px-4 py-2 rounded w-full mt-4 sm:mt-0"
             >
               Buy Now
