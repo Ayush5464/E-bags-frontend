@@ -62,8 +62,10 @@ export default function ProductManage() {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) setNewImage(file);
+    setForm((prevForm) => ({
+      ...prevForm,
+      images: e.target.files, // multiple FileList
+    }));
   };
 
   const handleUpdate = async (id) => {
@@ -120,17 +122,19 @@ export default function ProductManage() {
               {products.map((product, idx) => (
                 <tr key={product._id} className="border-b hover:bg-gray-50">
                   <td className="p-3">{idx + 1}</td>
-                  <td className="p-3 ">
+                  <td className="p-3">
                     {editingProductId === product._id ? (
                       <label className="cursor-pointer inline-block relative group">
                         <Edit
                           size={20}
-                          className="text-indigo-600 group-hover:scale-110 transition cursor-pointer"
+                          className="text-indigo-600 group-hover:scale-110 transition"
+                          title="Change Images"
                         />
                         <input
                           type="file"
                           name="images"
                           accept="image/*"
+                          multiple
                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                           onChange={handleImageChange}
                         />
