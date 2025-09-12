@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import API from "../api/axios";
-import AdminLayout from "./AdminLayout";
+import AdminLayout from "./AdminControlls/AdminLayout";
 
 export default function AdminProductUpload() {
   const [form, setForm] = useState({
