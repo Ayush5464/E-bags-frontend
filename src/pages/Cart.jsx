@@ -1,9 +1,7 @@
 import { useEffect } from "react";
 import { useCartStore } from "../store/useCartStore";
 import { useNavigate, Link } from "react-router-dom";
-
-// Backend base URL
-const BASE_URL = "https://e-bags-backend.onrender.com";
+import { Loader2 } from "lucide-react"; // ✅ import loader
 
 export default function Cart() {
   const { cart, fetchCart, removeFromCart, clearCart, loading } =
@@ -17,11 +15,14 @@ export default function Cart() {
   if (loading)
     return (
       <div className="flex items-center justify-center h-screen bg-gray-800">
-        <p className="text-gray-400">Loading cart...</p>
+        <Loader2 className="animate-spin text-gray-400" size={48} />
       </div>
     );
 
-  if (!cart || cart.items.length === 0) {
+  // ✅ Adjust cart structure
+  const items = cart?.items || cart || [];
+
+  if (!items || items.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <p className="text-gray-600 text-lg">Your cart is empty.</p>
@@ -29,18 +30,14 @@ export default function Cart() {
     );
   }
 
-  const total = cart.items.reduce(
+  const total = items.reduce(
     (acc, item) => acc + item.product.price * item.quantity,
     0
   );
 
-  // Helper to build full image URL
-  const getImageUrl = (path) =>
-    path?.startsWith("http") ? path : `${BASE_URL}/uploads/${path}`;
-
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4">
-      <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow">
+    <div className="min-h-screen bg-gray-800 py-8 px-4">
+      <div className="max-w-3xl mx-auto bg-gray-300 p-6 rounded-lg shadow">
         {/* Breadcrumb */}
         <nav className="text-sm text-gray-600 mb-6">
           <Link to="/" className="hover:underline">
@@ -52,28 +49,18 @@ export default function Cart() {
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Your Cart</h1>
 
         <ul className="divide-y">
-          {cart.items.map((item) => (
+          {items.map((item) => (
             <li
               key={item.product._id}
               className="py-4 flex justify-between items-center"
             >
-              <div className="flex items-center gap-4">
-                <img
-                  src={getImageUrl(
-                    item.product.images?.[0] || item.product.image
-                  )}
-                  alt={item.product.name}
-                  className="w-20 h-20 object-cover rounded"
-                />
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    {item.product.name}
-                  </h2>
-                  <p className="text-gray-600">Price: ₹{item.product.price}</p>
-                  <p className="text-gray-600">Qty: {item.quantity}</p>
-                </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {item.product.name}
+                </h2>
+                <p className="text-gray-600">Price: ₹{item.product.price}</p>
+                <p className="text-gray-600">Qty: {item.quantity}</p>
               </div>
-
               <button
                 onClick={() => removeFromCart(item.product._id)}
                 className="text-red-600 hover:underline text-sm"
@@ -99,7 +86,7 @@ export default function Cart() {
 
             <button
               onClick={() => navigate("/checkout")}
-              className="bg-blue-600 text-white px-4 py-2 rounded w-full sm:w-auto"
+              className="bg-blue-600 text-white px-4 py-2 rounded w-full mt-4 sm:mt-0"
             >
               Buy Now
             </button>
