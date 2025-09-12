@@ -145,7 +145,6 @@ export default function ProductManage() {
                       "No Image"
                     )}
                   </td>
-
                   {editingProductId === product._id ? (
                     <>
                       <td className="p-3">
@@ -188,14 +187,14 @@ export default function ProductManage() {
                           className="text-green-600 hover:text-green-800"
                           title="Save"
                         >
-                          <Save size={25} />
+                          <Save size={18} />
                         </button>
                         <button
                           onClick={handleCancel}
                           className="text-gray-600 hover:text-gray-800"
                           title="Cancel"
                         >
-                          <X size={25} />
+                          <X size={18} />
                         </button>
                       </td>
                     </>
