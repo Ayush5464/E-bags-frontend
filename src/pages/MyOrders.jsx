@@ -1,21 +1,35 @@
-// src/pages/MyOrders.jsx
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import API from "../api/axios";
 import { toast } from "react-hot-toast";
+import { Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function MyOrders() {
   const { user } = useAuthStore();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const fetchOrders = async () => {
     try {
-      const res = await API.get("/orders/my-orders"); // matches your backend route
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Unauthorized");
+
+      const res = await API.get("/orders/my-orders", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       setOrders(res.data);
     } catch (err) {
+      console.error("Error fetching orders:", err);
       toast.error("Failed to fetch your orders");
-      console.error(err);
+
+      if (err.response?.status === 401) {
+        navigate("/login");
+      }
     } finally {
       setLoading(false);
     }
@@ -25,10 +39,20 @@ export default function MyOrders() {
     if (user) fetchOrders();
   }, [user]);
 
-  if (loading) return <p className="p-4">Loading your orders...</p>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin text-gray-500" size={48} />
+      </div>
+    );
+
   if (!orders.length)
     return (
-      <p className="p-4 text-gray-500">You haven’t placed any orders yet.</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <p className="text-gray-500 text-lg">
+          You haven’t placed any orders yet.
+        </p>
+      </div>
     );
 
   return (
