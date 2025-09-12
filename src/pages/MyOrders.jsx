@@ -9,22 +9,15 @@ export default function MyOrders() {
   const [loading, setLoading] = useState(true);
 
   const fetchOrders = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      toast.error("You must be logged in to view orders");
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
     try {
+      const token = localStorage.getItem("token");
       const res = await API.get("/orders/my-orders", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setOrders(res.data);
     } catch (err) {
-      console.error("Failed to fetch orders:", err.response || err);
       toast.error(err.response?.data?.message || "Failed to fetch your orders");
+      console.error("Fetch orders error:", err);
     } finally {
       setLoading(false);
     }
@@ -63,15 +56,11 @@ export default function MyOrders() {
                   {new Date(order.createdAt).toLocaleDateString()}
                 </td>
                 <td className="p-3">₹{order.totalAmount}</td>
-                <td
-                  className={`p-3 font-semibold ${
-                    order.status === "Delivered"
-                      ? "text-green-600"
-                      : order.status === "Cancelled"
-                      ? "text-red-600"
-                      : "text-yellow-600"
-                  }`}
-                >
+                <td className={`p-3 font-semibold ${
+                  order.status === "Delivered" ? "text-green-600" :
+                  order.status === "Cancelled" ? "text-red-600" :
+                  "text-yellow-600"
+                }`}>
                   {order.status}
                 </td>
               </tr>

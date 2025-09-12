@@ -27,11 +27,9 @@ export default function Checkout() {
   const handlePlaceOrder = async () => {
     if (!address.trim()) return toast.error("Please enter shipping address");
 
-    const token = localStorage.getItem("token");
-    if (!token) return toast.error("You must be logged in to place an order");
-
     setLoading(true);
     try {
+      const token = localStorage.getItem("token"); // add auth header
       await API.post(
         "/orders",
         {
@@ -42,17 +40,15 @@ export default function Checkout() {
             quantity: item.quantity,
           })),
         },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       await clearCart();
       toast.success("Order placed successfully!");
       navigate("/thankyou");
     } catch (err) {
-      console.error("Order placement error:", err.response || err);
       toast.error(err.response?.data?.message || "Failed to place order");
+      console.error("Order placement error:", err);
     } finally {
       setLoading(false);
     }
@@ -95,6 +91,44 @@ export default function Checkout() {
         rows={3}
       />
 
+      <div className="mb-4 gap-2">
+        <input
+          type="radio"
+          id="credit"
+          name="payment-method"
+          value="credit-card"
+          className="mr-2"
+        />
+        <label htmlFor="credit" className="mr-4">
+          Credit Card
+        </label>
+
+        <input
+          type="radio"
+          id="paypal"
+          name="payment-method"
+          value="paypal"
+          className="mr-2"
+        />
+        <label htmlFor="paypal">PayPal</label>
+
+        <input
+          type="radio"
+          id="cod"
+          name="payment-method"
+          value="cash-on-delivery"
+          className="mr-2"
+        />
+        <label htmlFor="cod">Cash on Delivery</label>
+
+        <div className="mt-4 flex items-start">
+          <input type="checkbox" id="terms" className="mr-2" />
+          <label htmlFor="terms" className="text-gray-500 text-sm">
+            By placing your order, you agree to our Terms & Conditions.
+          </label>
+        </div>
+      </div>
+
       <button
         onClick={handlePlaceOrder}
         className="bg-green-600 text-white px-4 py-2 rounded w-full"
@@ -105,4 +139,3 @@ export default function Checkout() {
     </div>
   );
 }
-  
