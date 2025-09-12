@@ -120,12 +120,12 @@ export default function ProductManage() {
               {products.map((product, idx) => (
                 <tr key={product._id} className="border-b hover:bg-gray-50">
                   <td className="p-3">{idx + 1}</td>
-                  <td className="p-3 cursor-pointer">
+                  <td className="p-3 ">
                     {editingProductId === product._id ? (
                       <label className="cursor-pointer inline-block relative group">
                         <Edit
                           size={20}
-                          className="text-indigo-600 group-hover:scale-110 transition"
+                          className="text-indigo-600 group-hover:scale-110 transition cursor-pointer"
                         />
                         <input
                           type="file"
