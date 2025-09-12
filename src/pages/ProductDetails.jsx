@@ -3,7 +3,16 @@ import { useParams, Link } from "react-router-dom";
 import API from "../api/axios";
 import { Loader2 } from "lucide-react";
 import { useCartStore } from "../store/useCartStore";
-import { getImageUrl } from "../utils/getImageUrl";
+
+const BASE_URL = "https://e-bags-backend.onrender.com";
+
+// Helper function
+const getImageUrl = (img) => {
+  if (!img) return "";
+  return img.startsWith("http")
+    ? img
+    : `${BASE_URL}/uploads/${img.replace(/^\/uploads\//, "")}`;
+};
 
 export default function ProductDetails() {
   const { id } = useParams();
