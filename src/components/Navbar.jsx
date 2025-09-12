@@ -149,7 +149,7 @@ export default function Navbar() {
                   Products
                 </Link>
                 <Link
-                  to="/orders"
+                  to="/my-orders"
                   className="block text-gray-700 hover:text-blue-600"
                   onClick={() => setMobileMenuOpen(false)}
                 >
