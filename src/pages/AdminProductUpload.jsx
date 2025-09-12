@@ -1,8 +1,8 @@
 // pages/AdminControlls/AdminProductUpload.jsx
 import { useState } from "react";
-import API from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import API from "../api/axios";
 
 export default function AdminProductUpload() {
   const [form, setForm] = useState({
