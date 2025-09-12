@@ -4,17 +4,11 @@ import API from "../api/axios";
 import { useCartStore } from "../store/useCartStore";
 import { Loader2 } from "lucide-react";
 
-// Backend base URL
 const BASE_URL = "https://e-bags-backend.onrender.com";
 
-// Helper to generate correct image URL
-const getImageUrl = (path) => {
-  if (!path) return ""; // safety check
-  if (path.startsWith("http")) return path; // already full URL
-  return path.startsWith("/uploads/")
-    ? `${BASE_URL}${path}`
-    : `${BASE_URL}/uploads/${path}`;
-};
+// Helper to get full image URL
+const getImageUrl = (path) =>
+  path.startsWith("http") ? path : `${BASE_URL}${path}`;
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -42,9 +36,9 @@ export default function ProductDetails() {
     <div className="max-w-5xl mx-auto mt-8 p-4">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-600 mb-4">
-        <a href="/" className="hover:underline">
+        <Link to="/" className="hover:underline">
           Home
-        </a>{" "}
+        </Link>{" "}
         /{" "}
         <Link to="/products" className="hover:underline">
           Products
@@ -61,11 +55,11 @@ export default function ProductDetails() {
             className="w-full md:w-96 h-96 object-cover rounded-lg"
           />
           <div className="flex gap-2 mt-2 flex-wrap">
-            {product.images?.map((img, index) => (
+            {product.images?.map((img, idx) => (
               <img
-                key={index}
+                key={idx}
                 src={getImageUrl(img)}
-                alt={`Product ${index + 1}`}
+                alt={`Product ${idx + 1}`}
                 className={`w-20 h-20 object-cover rounded cursor-pointer border ${
                   mainImage === img ? "border-blue-600" : "border-gray-200"
                 }`}
