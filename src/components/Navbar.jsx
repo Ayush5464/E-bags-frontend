@@ -137,27 +137,27 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <div className="flex items-center gap-1 text-blue-600">
+                <div className="flex items-center gap-1 text-blue-600 ">
                   <User2 />
                   <span className="font-semibold">{user.name}</span>
                 </div>
                 <Link
                   to="/products"
-                  className="block text-gray-700 hover:text-blue-600"
+                  className="block text-gray-700 hover:text-blue-600 no-underline"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Products
                 </Link>
                 <Link
                   to="/my-orders"
-                  className="block text-gray-700 hover:text-blue-600"
+                  className="block text-gray-700 hover:text-blue-600 no-underline"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   My Orders
                 </Link>
                 <Link
                   to="/cart"
-                  className="flex items-center gap-1 text-gray-700 hover:text-blue-600"
+                  className="flex items-center gap-1 text-gray-700 hover:text-blue-600 no-underline"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <ShoppingBag size={18} />
