@@ -9,7 +9,7 @@ import { Loader2 } from "lucide-react";
 const getImageUrl = (path) => {
   if (!path) return "";
   const baseUrl = "https://e-bags-backend.onrender.com";
-  const encodedPath = encodeURI(path); // <== This fixes the space issue
+  const encodedPath = encodeURI(path); // 🔥 Fix spaces in image filenames
   return path.startsWith("http") ? path : `${baseUrl}${encodedPath}`;
 };
 
