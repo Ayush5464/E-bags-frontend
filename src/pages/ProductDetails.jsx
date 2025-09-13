@@ -5,10 +5,13 @@ import { useCartStore } from "../store/useCartStore";
 import { Loader2 } from "lucide-react";
 
 const BASE_URL = "https://e-bags-backend.onrender.com";
+const PLACEHOLDER = "https://via.placeholder.com/400x400?text=No+Image";
 
-// Helper to get full image URL
-const getImageUrl = (path) =>
-  path.startsWith("http") ? path : `${BASE_URL}${path}`;
+// Safely generate image URLs
+const getImageUrl = (path) => {
+  if (!path) return PLACEHOLDER;
+  return path.startsWith("http") ? path : `${BASE_URL}${path}`;
+};
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -20,9 +23,10 @@ export default function ProductDetails() {
     API.get(`/products/${id}`)
       .then((res) => {
         setProduct(res.data);
-        setMainImage(res.data.images?.[0] || res.data.image);
+        const main = res.data.images?.[0] || res.data.image || "";
+        setMainImage(main);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("Failed to fetch product", err));
   }, [id]);
 
   if (!product)
@@ -51,21 +55,34 @@ export default function ProductDetails() {
         <div className="flex flex-col gap-2">
           <img
             src={getImageUrl(mainImage)}
-            alt={product.name}
-            className="w-full md:w-96 h-96 object-cover rounded-lg"
+            alt={product.name || "Product Image"}
+            className="w-full md:w-96 h-96 object-cover rounded-lg border"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = PLACEHOLDER;
+            }}
           />
+
           <div className="flex gap-2 mt-2 flex-wrap">
-            {product.images?.map((img, idx) => (
-              <img
-                key={idx}
-                src={getImageUrl(img)}
-                alt={`Product ${idx + 1}`}
-                className={`w-20 h-20 object-cover rounded cursor-pointer border ${
-                  mainImage === img ? "border-blue-600" : "border-gray-200"
-                }`}
-                onClick={() => setMainImage(img)}
-              />
-            ))}
+            {product.images?.length > 0 ? (
+              product.images.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={getImageUrl(img)}
+                  alt={`Product ${idx + 1}`}
+                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${
+                    mainImage === img ? "border-blue-600" : "border-gray-200"
+                  }`}
+                  onClick={() => setMainImage(img)}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = PLACEHOLDER;
+                  }}
+                />
+              ))
+            ) : (
+              <p className="text-sm text-gray-500 italic">No images found</p>
+            )}
           </div>
         </div>
 
@@ -79,6 +96,7 @@ export default function ProductDetails() {
             </p>
             <p className="text-gray-700">{product.description}</p>
           </div>
+
           <button
             onClick={() => addToCart(product._id, 1)}
             className="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 w-full md:w-auto"
