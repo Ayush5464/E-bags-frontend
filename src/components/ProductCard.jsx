@@ -12,10 +12,12 @@ export default function ProductCard({ product }) {
     addToCart(product._id, 1);
   };
 
-  const getImageUrl = (path) =>
-    path?.startsWith("http")
-      ? path
-      : `https://e-bags-backend.onrender.com${path}`;
+  const getImageUrl = (path) => {
+    if (!path) return "";
+    const baseUrl = "https://e-bags-backend.onrender.com";
+    const encodedPath = encodeURI(path); // <== This fixes the space issue
+    return path.startsWith("http") ? path : `${baseUrl}${encodedPath}`;
+  };
 
   const mainImage = product.images?.[0] || product.image;
 

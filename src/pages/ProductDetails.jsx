@@ -6,11 +6,12 @@ import API from "../api/axios";
 import { useCartStore } from "../store/useCartStore";
 import { Loader2 } from "lucide-react";
 
-// ✅ Helper to get full image URL
-const getImageUrl = (path) =>
-  path?.startsWith("http")
-    ? path
-    : `https://e-bags-backend.onrender.com${path}`;
+const getImageUrl = (path) => {
+  if (!path) return "";
+  const baseUrl = "https://e-bags-backend.onrender.com";
+  const encodedPath = encodeURI(path); // <== This fixes the space issue
+  return path.startsWith("http") ? path : `${baseUrl}${encodedPath}`;
+};
 
 export default function ProductDetails() {
   const { id } = useParams();
