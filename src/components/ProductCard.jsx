@@ -12,6 +12,11 @@ export default function ProductCard({ product }) {
     addToCart(product._id, 1);
   };
 
+  const getImageUrl = (path) =>
+    path?.startsWith("http")
+      ? path
+      : `https://e-bags-backend.onrender.com${path}`;
+
   const mainImage = product.images?.[0] || product.image;
 
   return (

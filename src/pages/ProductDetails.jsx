@@ -3,13 +3,18 @@ import { Link, useParams } from "react-router-dom";
 import API from "../api/axios";
 import { useCartStore } from "../store/useCartStore";
 import { Loader2 } from "lucide-react";
-import { getImageUrl } from "../utils/getImageUrl";
+// import { getImageUrl } from "../utils/getImageUrl";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [mainImage, setMainImage] = useState("");
   const addToCart = useCartStore((state) => state.addToCart);
+
+  const getImageUrl = (path) =>
+    path?.startsWith("http")
+      ? path
+      : `https://e-bags-backend.onrender.com${path}`;
 
   useEffect(() => {
     API.get(`/products/${id}`)
@@ -30,9 +35,14 @@ export default function ProductDetails() {
   return (
     <div className="max-w-5xl mx-auto mt-8 p-4">
       <nav className="text-sm text-gray-600 mb-4">
-        <Link to="/" className="hover:underline">Home</Link> /{" "}
-        <Link to="/products" className="hover:underline">Products</Link> /{" "}
-        <span className="text-gray-800 font-medium">{product.name}</span>
+        <Link to="/" className="hover:underline">
+          Home
+        </Link>{" "}
+        /{" "}
+        <Link to="/products" className="hover:underline">
+          Products
+        </Link>{" "}
+        / <span className="text-gray-800 font-medium">{product.name}</span>
       </nav>
 
       <div className="flex flex-col md:flex-row gap-8">
