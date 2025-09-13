@@ -3,112 +3,57 @@ import { Link, useParams } from "react-router-dom";
 import API from "../api/axios";
 import { useCartStore } from "../store/useCartStore";
 import { Loader2 } from "lucide-react";
-
-const BASE_URL = "https://e-bags-backend.onrender.com";
-const PLACEHOLDER = "https://via.placeholder.com/400x400?text=No+Image";
-
-const getImageUrl = (path) => {
-  if (!path) return PLACEHOLDER;
-  return path.startsWith("http") ? path : `${BASE_URL}${path}`;
-};
+import { getImageUrl } from "../utils/getImageUrl";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [mainImage, setMainImage] = useState("");
-  const [error, setError] = useState("");
   const addToCart = useCartStore((state) => state.addToCart);
 
   useEffect(() => {
-    if (!id) {
-      setError("No product ID found");
-      return;
-    }
-    const fetchProduct = async () => {
-      try {
-        const res = await API.get(`/products/${id}`);
-        console.log("ProductDetails fetched response:", res.data);
-        // adjust according to actual response
-        const fetched = res.data.product || res.data;
-        setProduct(fetched);
-        const main = fetched.images?.[0] || fetched.image || "";
-        setMainImage(main);
-      } catch (err) {
-        console.error("Error fetching product details:", err);
-        setError(
-          err.response?.data?.message ||
-            err.message ||
-            "Failed to load product details"
-        );
-      }
-    };
-
-    fetchProduct();
+    API.get(`/products/${id}`)
+      .then((res) => {
+        setProduct(res.data);
+        setMainImage(res.data.images?.[0] || res.data.image);
+      })
+      .catch(console.error);
   }, [id]);
 
-  if (error) {
-    return (
-      <div className="p-4">
-        <p className="text-red-600">Error: {error}</p>
-      </div>
-    );
-  }
-
-  if (!product) {
+  if (!product)
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
         <Loader2 className="animate-spin text-gray-400" size={48} />
       </div>
     );
-  }
 
   return (
     <div className="max-w-5xl mx-auto mt-8 p-4">
       <nav className="text-sm text-gray-600 mb-4">
-        <Link to="/" className="hover:underline">
-          Home
-        </Link>{" "}
-        /{" "}
-        <Link to="/products" className="hover:underline">
-          Products
-        </Link>{" "}
-        / <span className="text-gray-800 font-medium">{product.name}</span>
+        <Link to="/" className="hover:underline">Home</Link> /{" "}
+        <Link to="/products" className="hover:underline">Products</Link> /{" "}
+        <span className="text-gray-800 font-medium">{product.name}</span>
       </nav>
 
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex flex-col gap-2">
           <img
             src={getImageUrl(mainImage)}
-            alt={product.name || "Product Image"}
-            className="w-full md:w-96 h-96 object-cover rounded-lg border"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = PLACEHOLDER;
-            }}
+            alt={product.name}
+            className="w-full md:w-96 h-96 object-cover rounded-lg"
           />
-
           <div className="flex gap-2 mt-2 flex-wrap">
-            {product.images?.length > 0 ? (
-              product.images.map((img, idx) => (
-                <img
-                  key={idx}
-                  src={getImageUrl(img)}
-                  alt={`Product ${idx + 1}`}
-                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${
-                    mainImage === img ? "border-blue-600" : "border-gray-200"
-                  }`}
-                  onClick={() => setMainImage(img)}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = PLACEHOLDER;
-                  }}
-                />
-              ))
-            ) : (
-              <p className="text-sm text-gray-500 italic">
-                No images available
-              </p>
-            )}
+            {product.images?.map((img, idx) => (
+              <img
+                key={idx}
+                src={getImageUrl(img)}
+                alt={`Product ${idx + 1}`}
+                className={`w-20 h-20 object-cover rounded cursor-pointer border ${
+                  mainImage === img ? "border-blue-600" : "border-gray-200"
+                }`}
+                onClick={() => setMainImage(img)}
+              />
+            ))}
           </div>
         </div>
 
