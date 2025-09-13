@@ -1,6 +1,6 @@
 import { useCartStore } from "../store/useCartStore";
 import { useNavigate } from "react-router-dom";
-import { getImageUrl } from "../utils/getImageUrl"; // If you saved helper separately
+// import { getImageUrl } from "../utils/getImageUrl"; // If you saved helper separately
 
 export default function ProductCard({ product }) {
   const addToCart = useCartStore((state) => state.addToCart);
