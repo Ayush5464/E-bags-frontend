@@ -1,9 +1,16 @@
+// src/pages/ProductDetails.jsx
+
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import API from "../api/axios";
 import { useCartStore } from "../store/useCartStore";
 import { Loader2 } from "lucide-react";
-// import { getImageUrl } from "../utils/getImageUrl";
+
+// ✅ Helper to get full image URL
+const getImageUrl = (path) =>
+  path?.startsWith("http")
+    ? path
+    : `https://e-bags-backend.onrender.com${path}`;
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -11,18 +18,13 @@ export default function ProductDetails() {
   const [mainImage, setMainImage] = useState("");
   const addToCart = useCartStore((state) => state.addToCart);
 
-  const getImageUrl = (path) =>
-    path?.startsWith("http")
-      ? path
-      : `https://e-bags-backend.onrender.com${path}`;
-
   useEffect(() => {
     API.get(`/products/${id}`)
       .then((res) => {
         setProduct(res.data);
         setMainImage(res.data.images?.[0] || res.data.image);
       })
-      .catch(console.error);
+      .catch((err) => console.error(err));
   }, [id]);
 
   if (!product)
@@ -34,6 +36,7 @@ export default function ProductDetails() {
 
   return (
     <div className="max-w-5xl mx-auto mt-8 p-4">
+      {/* Breadcrumb */}
       <nav className="text-sm text-gray-600 mb-4">
         <Link to="/" className="hover:underline">
           Home
@@ -46,6 +49,7 @@ export default function ProductDetails() {
       </nav>
 
       <div className="flex flex-col md:flex-row gap-8">
+        {/* Images */}
         <div className="flex flex-col gap-2">
           <img
             src={getImageUrl(mainImage)}
@@ -67,6 +71,7 @@ export default function ProductDetails() {
           </div>
         </div>
 
+        {/* Product Info */}
         <div className="flex-1 flex flex-col justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
