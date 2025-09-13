@@ -6,10 +6,19 @@ import toast from "react-hot-toast";
 import API from "../../api/axios";
 import AdminLayout from "./AdminLayout";
 
+const BASE_URL = "https://e-bags-backend.onrender.com";
+
 export default function ProductManage() {
   const [products, setProducts] = useState([]);
   const [editingProductId, setEditingProductId] = useState(null);
-  const [form, setForm] = useState({});
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    price: "",
+    category: "",
+    countInStock: "",
+    images: [],
+  });
 
   const fetchProducts = async () => {
     try {
@@ -17,7 +26,6 @@ export default function ProductManage() {
       setProducts(res.data.products || res.data);
     } catch (err) {
       toast.error("Failed to fetch products");
-      console.error(err);
     }
   };
 
@@ -46,7 +54,7 @@ export default function ProductManage() {
       price: product.price,
       category: product.category,
       countInStock: product.countInStock,
-      images: [],
+      images: [], // reset for new uploads
     });
   };
 
@@ -55,25 +63,18 @@ export default function ProductManage() {
     setForm({});
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
-  const handleImageChange = (e) => {
-    setForm((prevForm) => ({
-      ...prevForm,
-      images: e.target.files, // FileList (multiple files)
-    }));
-  };
+  const handleImageChange = (e) =>
+    setForm({ ...form, images: Array.from(e.target.files) });
 
   const handleUpdate = async (id) => {
     try {
       const formData = new FormData();
       for (let key in form) {
         if (key === "images") {
-          for (let file of form.images) {
-            formData.append("images", file);
-          }
+          form.images.forEach((img) => formData.append("images", img));
         } else {
           formData.append(key, form[key]);
         }
@@ -98,10 +99,7 @@ export default function ProductManage() {
   return (
     <AdminLayout>
       <div className="p-6 bg-gray-100 min-h-screen">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">
-          Manage Products
-        </h1>
-
+        <h1 className="text-2xl font-bold mb-6">Manage Products</h1>
         <div className="overflow-x-auto bg-white rounded shadow">
           <table className="w-full table-auto border-collapse">
             <thead className="bg-gray-200">
@@ -120,15 +118,11 @@ export default function ProductManage() {
                 <tr key={product._id} className="border-b hover:bg-gray-50">
                   <td className="p-3">{idx + 1}</td>
 
-                  {/* Editable Image Cell */}
+                  {/* Image */}
                   <td className="p-3">
                     {editingProductId === product._id ? (
                       <label className="cursor-pointer inline-block relative group">
-                        <ImageIcon
-                          size={20}
-                          className="text-indigo-600 group-hover:scale-110 transition"
-                          title="Change Images"
-                        />
+                        <ImageIcon className="text-indigo-600 group-hover:scale-110 transition" />
                         <input
                           type="file"
                           name="images"
@@ -140,7 +134,7 @@ export default function ProductManage() {
                       </label>
                     ) : product.images?.[0] ? (
                       <img
-                        src={`https://e-bags-backend.onrender.com${product.images[0]}`}
+                        src={`${BASE_URL}${product.images[0]}`}
                         alt={product.name}
                         className="w-16 h-16 object-cover rounded"
                       />
@@ -149,7 +143,6 @@ export default function ProductManage() {
                     )}
                   </td>
 
-                  {/* Editable Fields */}
                   {editingProductId === product._id ? (
                     <>
                       <td className="p-3">
@@ -190,16 +183,14 @@ export default function ProductManage() {
                         <button
                           onClick={() => handleUpdate(product._id)}
                           className="text-green-600 hover:text-green-800"
-                          title="Save"
                         >
-                          <Save size={25} />
+                          <Save size={20} />
                         </button>
                         <button
                           onClick={handleCancel}
                           className="text-gray-600 hover:text-gray-800"
-                          title="Cancel"
                         >
-                          <X size={25} />
+                          <X size={20} />
                         </button>
                       </td>
                     </>
@@ -214,13 +205,13 @@ export default function ProductManage() {
                           onClick={() => handleEdit(product)}
                           className="text-blue-600 hover:text-blue-800"
                         >
-                          <Edit size={25} />
+                          <Edit size={20} />
                         </button>
                         <button
                           onClick={() => handleDelete(product._id)}
                           className="text-red-600 hover:text-red-800"
                         >
-                          <Trash2 size={25} />
+                          <Trash2 size={20} />
                         </button>
                       </td>
                     </>
