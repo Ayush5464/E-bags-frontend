@@ -8,12 +8,17 @@ export default function ProductCard({ product }) {
   const navigate = useNavigate();
 
   const handleCardClick = () => navigate(`/products/${product._id}`);
+
   const handleAddToCart = (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // prevent navigation
     addToCart(product._id, 1);
   };
 
-  const mainImage = product.images?.[0] || product.image;
+  const mainImage = product.images?.[0]
+    ? product.images[0].startsWith("http")
+      ? product.images[0]
+      : `${BASE_URL}${product.images[0]}`
+    : "https://via.placeholder.com/300x200.png?text=No+Image";
 
   return (
     <div
@@ -22,21 +27,28 @@ export default function ProductCard({ product }) {
     >
       <div className="p-5">
         <img
-          src={
-            mainImage.startsWith("http") ? mainImage : `${BASE_URL}${mainImage}`
-          }
-          alt={product.name}
-          className="h-48 w-full object-cover"
+          src={mainImage}
+          alt={product.name || "Product Image"}
+          className="h-48 w-full object-cover rounded"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src =
+              "https://via.placeholder.com/300x200.png?text=No+Image";
+          }}
         />
       </div>
+
       <div className="p-4 flex flex-col justify-between h-full">
         <div>
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="text-lg font-semibold text-gray-800 truncate">
             {product.name}
           </h2>
           <p className="text-gray-600 text-sm mt-1">₹{product.price}</p>
-          <p className="text-xs text-gray-400 mt-1">{product.category}</p>
+          <p className="text-xs text-gray-400 mt-1 capitalize">
+            {product.category}
+          </p>
         </div>
+
         <button
           onClick={handleAddToCart}
           className="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded transition"
