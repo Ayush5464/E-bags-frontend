@@ -7,7 +7,6 @@ import { Loader2 } from "lucide-react";
 const BASE_URL = "https://e-bags-backend.onrender.com";
 const PLACEHOLDER = "https://via.placeholder.com/400x400?text=No+Image";
 
-// Safely generate image URLs
 const getImageUrl = (path) => {
   if (!path) return PLACEHOLDER;
   return path.startsWith("http") ? path : `${BASE_URL}${path}`;
@@ -17,28 +16,54 @@ export default function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [mainImage, setMainImage] = useState("");
+  const [error, setError] = useState("");
   const addToCart = useCartStore((state) => state.addToCart);
 
   useEffect(() => {
-    API.get(`/products/${id}`)
-      .then((res) => {
-        setProduct(res.data);
-        const main = res.data.images?.[0] || res.data.image || "";
+    if (!id) {
+      setError("No product ID found");
+      return;
+    }
+    const fetchProduct = async () => {
+      try {
+        const res = await API.get(`/products/${id}`);
+        console.log("ProductDetails fetched response:", res.data);
+        // adjust according to actual response
+        const fetched = res.data.product || res.data;
+        setProduct(fetched);
+        const main = fetched.images?.[0] || fetched.image || "";
         setMainImage(main);
-      })
-      .catch((err) => console.error("Failed to fetch product", err));
+      } catch (err) {
+        console.error("Error fetching product details:", err);
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            "Failed to load product details"
+        );
+      }
+    };
+
+    fetchProduct();
   }, [id]);
 
-  if (!product)
+  if (error) {
+    return (
+      <div className="p-4">
+        <p className="text-red-600">Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (!product) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
         <Loader2 className="animate-spin text-gray-400" size={48} />
       </div>
     );
+  }
 
   return (
     <div className="max-w-5xl mx-auto mt-8 p-4">
-      {/* Breadcrumb */}
       <nav className="text-sm text-gray-600 mb-4">
         <Link to="/" className="hover:underline">
           Home
@@ -51,7 +76,6 @@ export default function ProductDetails() {
       </nav>
 
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Images */}
         <div className="flex flex-col gap-2">
           <img
             src={getImageUrl(mainImage)}
@@ -81,12 +105,13 @@ export default function ProductDetails() {
                 />
               ))
             ) : (
-              <p className="text-sm text-gray-500 italic">No images found</p>
+              <p className="text-sm text-gray-500 italic">
+                No images available
+              </p>
             )}
           </div>
         </div>
 
-        {/* Product Info */}
         <div className="flex-1 flex flex-col justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
@@ -96,7 +121,6 @@ export default function ProductDetails() {
             </p>
             <p className="text-gray-700">{product.description}</p>
           </div>
-
           <button
             onClick={() => addToCart(product._id, 1)}
             className="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 w-full md:w-auto"
